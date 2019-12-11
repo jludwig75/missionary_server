@@ -2,9 +2,9 @@
     "open_weather_map_key": "",
     "location": "Manila,ph",
     "timezone": "Asia/Manila",
+    "mission_name": "",
     "missionary_name": "",
     "missionary_gender": "M/F",
-    "mission_name": "",
     "start_date": "2019-10-30",
     "release_date": "2021-04-30"
 }
