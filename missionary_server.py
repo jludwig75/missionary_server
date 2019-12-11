@@ -7,12 +7,16 @@ from weather import Weather
 import json
 
 
+SETTINGS_FILE_DATE_FORMAT = '%Y-%m-%d'
+
 class MissionaryServer(object):
     def __init__(self, settings):
         self._missionary_name = settings['missionary_name']
         self._mission_name = settings['mission_name']
         self._missionary_tz = pytz.timezone(settings['timezone'])
         self._weather = Weather(settings['open_weather_map_key'], settings['location'])
+        self._start_date = datetime.strptime(settings['start_date'], SETTINGS_FILE_DATE_FORMAT)
+        self._release_date = datetime.strptime(settings['release_date'], SETTINGS_FILE_DATE_FORMAT)
 
     @property
     def _local_time(self):
@@ -94,6 +98,17 @@ class MissionaryServer(object):
             sunset = 'unavailable'
         return sunset
 
+    @cherrypy.expose
+    def days_served(self):
+        duration = datetime.now() - self._start_date
+        print(type(duration))
+        return str(duration.days)
+
+    @cherrypy.expose
+    def days_remaining(self):
+        duration = self._release_date - datetime.now()
+        print(type(duration))
+        return str(duration.days)
 
 if __name__ == '__main__':
     with open('settings.json') as f:
