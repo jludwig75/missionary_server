@@ -6,8 +6,13 @@ import pytz
 from weather import Weather
 import json
 
+USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
+USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
+SETTINGS_FILE_DATE_FORMAT = '%Y-%m-%d' # 2019-10-30
 
-SETTINGS_FILE_DATE_FORMAT = '%Y-%m-%d'
+class Gender:
+    Male = 0
+    Female = 1
 
 class MissionaryServer(object):
     def __init__(self, settings):
@@ -15,6 +20,13 @@ class MissionaryServer(object):
         self._mission_name = settings['mission_name']
         self._missionary_tz = pytz.timezone(settings['timezone'])
         self._weather = Weather(settings['open_weather_map_key'], settings['location'])
+
+        gender = settings['missionary_gender'].upper()
+        if gender == 'M':
+            self._gender = Gender.Male
+        else:
+            assert gender == 'F'
+            self._gender = Gender.Female
 
         try:
             self._start_date = datetime.strptime(settings['start_date'], SETTINGS_FILE_DATE_FORMAT)
@@ -24,15 +36,23 @@ class MissionaryServer(object):
         try:
             self._release_date = datetime.strptime(settings['release_date'], SETTINGS_FILE_DATE_FORMAT)
         except:
-            self._release_date = self._start_date + timedelta(days=2*365)
+            days = 2 * 365 if self._gender == Gender.Male else 365 + 365 / 2
+            self._release_date = self._start_date + timedelta(days=days)
 
-    @property
     def _local_time(self):
         return datetime.now()
 
     def _mission_time(self, t=None):
         utc_now = pytz.utc.localize(datetime.utcnow() if t == None else t)
         return utc_now.astimezone(self._missionary_tz)
+
+    def _user_date_format(self, dt):
+        # remove any leading pad 0's from date
+        return dt.strftime(USER_DATE_FORMAT).lstrip("0").replace(" 0", " ")
+
+    def _user_time_format(self, dt):
+        # remove any leading pad 0's from time (except after :'s)
+        return dt.strftime(USER_TIME_FORMAT).lstrip("0").replace(" 0", " ")
 
     @cherrypy.expose
     def index(self):
@@ -48,23 +68,19 @@ class MissionaryServer(object):
 
     @cherrypy.expose
     def local_time(self):
-        now = self._local_time
-        return now.strftime('%I:%M %p').lstrip("0").replace(" 0", " ")
+        return self._user_time_format(self._local_time())
 
     @cherrypy.expose
     def local_date(self):
-        now = self._local_time
-        return now.strftime('%a, %b %d, %Y').lstrip("0").replace(" 0", " ")
+        return self._user_date_format(self._local_time())
 
     @cherrypy.expose
     def mission_time(self):
-        pht_now = self._mission_time()
-        return pht_now.strftime('%I:%M %p').lstrip("0").replace(" 0", " ")
+        return self._user_time_format(self._mission_time())
 
     @cherrypy.expose
     def mission_date(self):
-        pht_now = self._mission_time()
-        return pht_now.strftime('%a, %b %d, %Y').lstrip("0").replace(" 0", " ")
+        return self._user_date_format(self._mission_time())
     
     @cherrypy.expose
     def mission_temp(self):
@@ -105,6 +121,14 @@ class MissionaryServer(object):
         except:
             sunset = 'unavailable'
         return sunset
+
+    @cherrypy.expose
+    def start_date(self):
+        return self._user_date_format(self._start_date)
+
+    @cherrypy.expose
+    def release_date(self):
+        return self._user_date_format(self._release_date)
 
     @cherrypy.expose
     def days_served(self):
