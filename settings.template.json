@@ -1,5 +1,9 @@
 {
-    "open_weather_app_key": "",
+    "open_weather_map_key": "",
     "location": "Manila,ph",
-    "timezone": "Asia/Manila"
+    "timezone": "Asia/Manila",
+    "missionary_name": "",
+    "mission_name": "",
+    "start_date": "",
+    "release_date": ""
 }
