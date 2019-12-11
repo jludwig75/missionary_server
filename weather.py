@@ -25,7 +25,9 @@ class Weather:
         return json.loads(data.decode("utf-8"))
 
 if __name__ == '__main__':
-    weather = Weather('1f2b4a6cc54d6c4fffc9515b17208d4b', 'Cebu%20City,ph')
+    with open('settings.json') as f:
+        settings = json.loads(f.read())
+    weather = Weather(settings['open_weather_map_key'], 'Cebu%20City,ph')
     cc = weather.current_conditions()
     print(json.dumps(cc))
     print(cc['main']['temp'])
