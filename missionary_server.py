@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import cherrypy
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from weather import Weather
 import json
@@ -15,8 +15,16 @@ class MissionaryServer(object):
         self._mission_name = settings['mission_name']
         self._missionary_tz = pytz.timezone(settings['timezone'])
         self._weather = Weather(settings['open_weather_map_key'], settings['location'])
-        self._start_date = datetime.strptime(settings['start_date'], SETTINGS_FILE_DATE_FORMAT)
-        self._release_date = datetime.strptime(settings['release_date'], SETTINGS_FILE_DATE_FORMAT)
+
+        try:
+            self._start_date = datetime.strptime(settings['start_date'], SETTINGS_FILE_DATE_FORMAT)
+        except:
+            self._start_date = datetime.now()
+
+        try:
+            self._release_date = datetime.strptime(settings['release_date'], SETTINGS_FILE_DATE_FORMAT)
+        except:
+            self._release_date = self._start_date + timedelta(days=2*365)
 
     @property
     def _local_time(self):
@@ -100,12 +108,16 @@ class MissionaryServer(object):
 
     @cherrypy.expose
     def days_served(self):
+        if datetime.now() < self._start_date:
+            return '0'
         duration = datetime.now() - self._start_date
         print(type(duration))
         return str(duration.days)
 
     @cherrypy.expose
     def days_remaining(self):
+        if self._release_date < datetime.now():
+            return '0'
         duration = self._release_date - datetime.now()
         print(type(duration))
         return str(duration.days)
