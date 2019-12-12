@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import pytz
 from weather import Weather
 import json
+import os
 
 USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
 USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
@@ -179,11 +180,25 @@ class Mission(object):
         except:
             return 'unavailable'
 
+class Root(object):
+    @cherrypy.expose
+    def index(self):
+        with open('index.html') as f:
+            return f.read()
 
 if __name__ == '__main__':
     with open('settings.json') as f:
         settings = json.loads(f.read())
     cherrypy.server.socket_host = '0.0.0.0'
+
+    conf = {
+        '/static': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': os.path.abspath('./public')
+        }
+    }    
+
+    cherrypy.tree.mount(Root(), '/', conf)
     cherrypy.tree.mount(Local(settings), '/local')
     cherrypy.tree.mount(Missionary(settings), '/missionary')
-    cherrypy.quickstart(Mission(settings), '/mission')
+    cherrypy.quickstart(Mission(settings), '/mission', conf)
