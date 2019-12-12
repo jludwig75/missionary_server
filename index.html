@@ -1,0 +1,135 @@
+<html>
+    <head>
+        <style>
+            body:after {
+                content: "";
+                background-image: url("manila_mtc.jpg");
+                background-repeat: no-repeat;
+                background-size: cover;
+                opacity: 0.6;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                position: absolute;
+                z-index: -1;  
+            }
+            .header {
+                text-align: center;
+            }
+            .inner {
+                padding: 10px;
+            }
+            .missionary, .times, .sunriseset, .conditions, .map, .slideshow {
+                float: left;
+                text-align: left;
+            }
+            .missionary {
+                width: 25%;
+            }
+            .times {
+                width: 25%;
+            }
+            .sunriseset {
+                width: 25%;
+            }
+            .conditions {
+                width: 25%;
+            }
+            .header:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            .footer {
+                text-align: center;
+            }
+            .map, .slideshow {
+                text-align: center;
+            }
+            .map {
+                width: 35%;
+            }
+            .slideshow {
+                width: 65%;
+            }
+            .mapframe {
+                margin: 60px;
+            }
+            .slideframe {
+                margin: 60px;
+            }
+            .time {
+                font-size: 200%;
+                float: left;
+                vertical-align: bottom;
+            }
+            .date {
+                font-size: 100%;
+                float: left;
+                vertical-align: bottom;
+            }
+            .datetime:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            .missionaryname {
+                font-size: 200%;
+            }
+            .missionname {
+                font-size: 150%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="missionary">
+                <div class="inner">
+                    <div>photo</div>
+                    <div class="missionaryname">Sister Karley Ludwig</div>
+                    <div class="missionname">Philippines Cebu East Mission</div>
+                </div>
+            </div>
+            <div class="times">
+                <div class="inner">
+                    <div class="datetime">
+                        <div>Local Time</div>
+                        <div class="time">5:15 PM</div>
+                        <div class="date">Thu, Dec 11, 2019</div>
+                    </div>
+                    <div>
+                            <div>Mission Time</div>
+                            <div class="time">8:15 AM</div>
+                            <div class="date">Thu, Dec 12, 2019</div>
+                        </div>
+                    </div>
+                </div>
+            <div class="sunriseset">
+                <div class="inner">
+                    <div>Daytime</div>
+                    <div>Sunrise: 6:11 AM</div>
+                    <div>Sunset: 5:51 PM</div>
+                </div>
+            </div>
+            <div class="conditions">
+                <div class="inner">
+                    <div>79&deg F</div>
+                    <div>80% humidity</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="map">
+                <div class="mapframe">
+                    <img src="mission.jpg" style="width:auto;height:600px;">
+                </div>
+            </div>
+            <div class="slideshow">
+                <div class="slideframe">
+                    <img src="cebu_temple.jpg" style="width:auto;height:600px;">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
