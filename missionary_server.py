@@ -176,7 +176,7 @@ class Mission(object):
             sunrise = int(cc['sys']['sunrise'])
             sunset = int(cc['sys']['sunset'])
             now = int(cc['dt'])
-            return "day" if now >= sunrise and now <= sunset else "night"
+            return "Daytime" if now >= sunrise and now <= sunset else "Night"
         except:
             return 'unavailable'
 
