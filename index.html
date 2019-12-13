@@ -45,17 +45,20 @@
                 text-align: left;
             }
             .missionary {
-                width: 20%;
+                width: 25%;
                 text-align: center;
             }
             .times {
-                width: 28%;
+                width: 30%;
             }
             .sunriseset {
-                width: 26%;
+                width: 25%;
             }
             .conditions {
-                width: 26%;
+                width: 20%;
+            }
+            .conditions, .sunriseset {
+                font-size: 180%;
             }
             .header:after {
                 content: "";
@@ -74,21 +77,23 @@
             .slideshow {
                 width: 65%;
             }
-            .mapframe {
-                margin: 60px;
+            .mapframe, .slideframe {
+                margin: 20px;
             }
-            .slideframe {
-                margin: 60px;
+            .datetimebox {
+                vertical-align: middle;
             }
             .time {
                 font-size: 200%;
                 float: left;
                 vertical-align: bottom;
+                margin: 0 0.25em 0 0.5em;
             }
             .date {
                 font-size: 100%;
                 float: left;
                 vertical-align: bottom;
+                margin: 0.85em 0.25em 0 0.5em;
             }
             .datetime:after {
                 content: "";
@@ -118,21 +123,25 @@
                 <div class="inner">
                     <div class="datetime">
                         <div>Local Time</div>
-                        <div id="local_time" class="time">0:00 AM</div>
-                        <div id="local_date" class="date">Thu, Jan 1, 2000</div>
+                        <div class="datetimebox">
+                            <div id="local_time" class="time">0:00 AM</div>
+                            <div id="local_date" class="date">Thu, Jan 1, 2000</div>
+                        </div>
                     </div>
-                    <div>
+                    <div class="datetime">
                             <div>Mission Time</div>
-                            <div id="mission_time" class="time">0:00 AM</div>
-                            <div id="mission_date" class="date">Thu, Jan 1, 2000</div>
+                            <div class="datetimebox">
+                                <span class="time">8:15 AM</span>
+                                <span class="date">Thu, Dec 12, 2019</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             <div class="sunriseset">
                 <div class="inner">
-                    <div id="time_of_day">Daytime</div>
-                    <div>Sunrise: <span id="sunrise">0:00 AM</span></div>
-                    <div>Sunset: <span id="sunset">0:00 AM</span></div>
+                    <div><img src="daytime.png" style="width:auto;height:65px;"></div>
+                    <div>Sunrise: 6:11 AM</div>
+                    <div>Sunset: 5:51 PM</div>
                 </div>
             </div>
             <div class="conditions">
