@@ -2,7 +2,7 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script type="text/javascript">
-            $(document).ready(function(){
+            function update_page() {
                 $('#missionary_name').load("missionary/name");
                 $('#mission_name').load("mission/name");
                 $('#local_time').load("local/time");
@@ -14,6 +14,10 @@
                 $('#sunrise').load("mission/sunrise");
                 $('#sunset').load("mission/sunset");
                 $('#time_of_day').load("mission/time_of_day");
+            }
+            $(document).ready(function(){
+                update_page();
+                setInterval(update_page, 10000);
             });
         </script>
         <style>
@@ -106,35 +110,35 @@
                     <div>
                         <img src="static/karley2.jpg" style="width:auto;height:150px;">
                     </div>
-                    <div id="missionary_name" class="missionaryname">Sister Karley Ludwig</div>
-                    <div class="missionname"><span id="mission_name">Philippines Cebu East Mission</span> Mission</div>
+                    <div id="missionary_name" class="missionaryname">Elder/Sister Missionary Name</div>
+                    <div class="missionname"><span id="mission_name">Mission Name</span> Mission</div>
                 </div>
             </div>
             <div class="times">
                 <div class="inner">
                     <div class="datetime">
                         <div>Local Time</div>
-                        <div id="local_time" class="time">5:15 PM</div>
-                        <div id="local_date" class="date">Thu, Dec 11, 2019</div>
+                        <div id="local_time" class="time">0:00 AM</div>
+                        <div id="local_date" class="date">Thu, Jan 1, 2000</div>
                     </div>
                     <div>
                             <div>Mission Time</div>
-                            <div id="mission_time" class="time">8:15 AM</div>
-                            <div id="mission_date" class="date">Thu, Dec 12, 2019</div>
+                            <div id="mission_time" class="time">0:00 AM</div>
+                            <div id="mission_date" class="date">Thu, Jan 1, 2000</div>
                         </div>
                     </div>
                 </div>
             <div class="sunriseset">
                 <div class="inner">
                     <div id="time_of_day">Daytime</div>
-                    <div>Sunrise: <span id="sunrise">6:11 AM</span></div>
-                    <div>Sunset: <span id="sunset">5:51 PM</span></div>
+                    <div>Sunrise: <span id="sunrise">0:00 AM</span></div>
+                    <div>Sunset: <span id="sunset">0:00 AM</span></div>
                 </div>
             </div>
             <div class="conditions">
                 <div class="inner">
-                    <div><span id="temperature">79</span>&deg F</div>
-                    <div><span id="humidity">80</span>% humidity</div>
+                    <div><span id="temperature">0</span>&deg F</div>
+                    <div><span id="humidity">0</span>% humidity</div>
                 </div>
             </div>
         </div>
