@@ -13,7 +13,13 @@
                 $('#humidity').load("mission/humidity");
                 $('#sunrise').load("mission/sunrise");
                 $('#sunset').load("mission/sunset");
-                $('#time_of_day').load("mission/time_of_day");
+                $.get( "mission/time_of_day", function( data ) {
+                    if (data == 'Daytime') {
+                        $('#time_of_day').html('<img class="time_of_day_image" src="static/daytime.png">');
+                    } else {
+                        $('#time_of_day').html('<img class="time_of_day_image" src="static/nighttime.png">');
+                    }
+                });
             }
             $(document).ready(function(){
                 update_page();
@@ -109,6 +115,10 @@
             .missionname {
                 font-size: 150%;
             }
+            .time_of_day_image {
+                width: auto;
+                height: 65px;
+            }
         </style>
     </head>
     <body>
@@ -142,7 +152,7 @@
                 </div>
             <div class="sunriseset">
                 <div class="inner">
-                    <div><img src="static/daytime.png" style="width:auto;height:65px;"></div>
+                    <div id="time_of_day"></div>
                     <div>Sunrise: 6:11 AM</div>
                     <div>Sunset: 5:51 PM</div>
                 </div>
