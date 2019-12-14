@@ -93,6 +93,11 @@
             .mapframe, .slideframe {
                 margin: 20px;
             }
+            .mapframe {
+                height: 60%;
+                width: 70%;
+                margin-left: 20%;
+            }
             .slideshowimage {
                 width:auto;
                 height:60%;
@@ -175,9 +180,21 @@
         </div>
         <div class="footer">
             <div class="map">
-                <div class="mapframe">
-                    <img src="static/mission.jpg" style="width:auto;height:60%;">
+                <div id="mapframe" class="mapframe">
                 </div>
+                <script>
+                    var map;
+                    function initMap() {
+                      map = new google.maps.Map(document.getElementById('mapframe'), {
+                        center: {lat: 14.600, lng: 121.034},
+                        zoom: 8
+                      });
+                      var marker = new google.maps.Marker({position: {lat: 14.6005807, lng:121.0678641}, map: map});
+                    }
+                  </script>
+                  <script src="https://maps.googleapis.com/maps/api/js?key=<<API_KEY>>&callback=initMap"
+                  async defer
+                  ></script>
             </div>
             <div class="slideshow">
                 <div id="slideframe" class="slideframe">

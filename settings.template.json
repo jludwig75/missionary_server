@@ -6,5 +6,6 @@
     "missionary_name": "",
     "missionary_gender": "M/F",
     "start_date": "2019-01-13",
-    "release_date": "2021-12-03"
+    "release_date": "2021-12-03",
+    "maps_api_key": ""
 }

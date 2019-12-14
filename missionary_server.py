@@ -182,10 +182,13 @@ class Mission(object):
             return 'unavailable'
 
 class Root(object):
+    def __init__(self, settings):
+        self._map_key = settings['maps_api_key']
     @cherrypy.expose
     def index(self):
         with open('index.html') as f:
-            return f.read()
+            text = f.read()
+        return text.replace('<<API_KEY>>', self._map_key)
 
 class SlideShow(object):
     def __init__(self, image_dir_path):
@@ -216,7 +219,7 @@ if __name__ == '__main__':
         }
     }    
 
-    cherrypy.tree.mount(Root(), '/', conf)
+    cherrypy.tree.mount(Root(settings), '/', conf)
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
     cherrypy.tree.mount(Local(settings), '/local')
     cherrypy.tree.mount(Missionary(settings), '/missionary')
