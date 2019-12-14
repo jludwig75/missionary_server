@@ -7,6 +7,7 @@ from weather import Weather
 import json
 import os
 import random
+from PIL import Image, ExifTags
 
 USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
 USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
@@ -190,6 +191,20 @@ class Root(object):
             text = f.read()
         return text.replace('<<API_KEY>>', self._map_key)
 
+ROTATION_MAP = { 1: 'landscape', 6: 'portrait_right', 8: 'portrait_left', 3: 'upside'}
+
+def get_image_orientation(image_file_name):
+    print(image_file_name)
+    with Image.open(image_file_name) as img:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif=dict(img._getexif().items())
+        print(exif[orientation])
+        print('W=%u, H=%u' % (img.width, img.height))
+        return ROTATION_MAP[exif[orientation]] if exif[orientation] in ROTATION_MAP else "unknown"
+    return "unknown"
+
 class SlideShow(object):
     def __init__(self, image_dir_path):
         self._image_dir_path = image_dir_path
@@ -201,7 +216,10 @@ class SlideShow(object):
             extension = file_name.split('.')[-1]
             if extension.lower() in ['jpg', 'png']:
                 file_names.append('slides/' + file_name)
-        return random.choice(file_names)
+        file_name = random.choice(file_names)
+        ret = {'file_name': file_name, 'orientation': get_image_orientation(file_name)}
+        print(file_name, ret)
+        return json.dumps(ret)
 
 if __name__ == '__main__':
     with open('settings.json') as f:

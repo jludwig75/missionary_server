@@ -21,7 +21,8 @@
                     }
                 });
                 $.get( "slideshow/next", function( data ) {
-                    var image_url = '<img class="slideshowimage" src="' + data + '">';
+                    var image_data = JSON.parse(data);
+                    var image_url = '<img class="slideshowimage ' + image_data.orientation + '" src="' + image_data.file_name + '">';
                     $('#slideframe').html(image_url);
                 });
             }
@@ -101,6 +102,15 @@
             .slideshowimage {
                 width:auto;
                 height:60%;
+            }
+            .portrait_left {
+                transform: rotate(270deg);
+            }
+            .portrait_right {
+                transform: rotate(90deg);
+            }
+            .upside {
+                transform: rotate(180deg);
             }
             .datetimebox {
                 vertical-align: middle;
