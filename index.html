@@ -3,7 +3,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script type="text/javascript">
             function update_page() {
-                $('#missionary_name').load("missionary/name");
+                $('#missionary_name').load("missionary/name?title");
                 $('#mission_name').load("mission/name");
                 $('#local_time').load("local/time");
                 $('#local_date').load("local/date");
@@ -19,6 +19,10 @@
                     } else {
                         $('#time_of_day').html('<img class="time_of_day_image" src="static/nighttime.png">');
                     }
+                });
+                $.get( "slideshow/next", function( data ) {
+                    var image_url = '<img class="slideshowimage" src="' + data + '">';
+                    $('#slideframe').html(image_url);
                 });
             }
             $(document).ready(function(){
@@ -88,6 +92,10 @@
             }
             .mapframe, .slideframe {
                 margin: 20px;
+            }
+            .slideshowimage {
+                width:auto;
+                height:60%;
             }
             .datetimebox {
                 vertical-align: middle;
@@ -172,7 +180,7 @@
                 </div>
             </div>
             <div class="slideshow">
-                <div class="slideframe">
+                <div id="slideframe" class="slideframe">
                     <img src="static/cebu_temple.jpg" style="width:auto;height:60%;">
                 </div>
             </div>

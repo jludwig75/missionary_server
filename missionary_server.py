@@ -6,6 +6,7 @@ import pytz
 from weather import Weather
 import json
 import os
+import random
 
 USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
 USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
@@ -186,6 +187,19 @@ class Root(object):
         with open('index.html') as f:
             return f.read()
 
+class SlideShow(object):
+    def __init__(self, image_dir_path):
+        self._image_dir_path = image_dir_path
+
+    @cherrypy.expose
+    def next(self):
+        file_names = []
+        for file_name in os.listdir(self._image_dir_path):
+            extension = file_name.split('.')[-1]
+            if extension.lower() in ['jpg', 'png']:
+                file_names.append('slides/' + file_name)
+        return random.choice(file_names)
+
 if __name__ == '__main__':
     with open('settings.json') as f:
         settings = json.loads(f.read())
@@ -195,10 +209,15 @@ if __name__ == '__main__':
         '/static': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': os.path.abspath('./public')
+        },
+        '/slides': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': os.path.abspath('./slides')
         }
     }    
 
     cherrypy.tree.mount(Root(), '/', conf)
+    cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
     cherrypy.tree.mount(Local(settings), '/local')
     cherrypy.tree.mount(Missionary(settings), '/missionary')
     cherrypy.quickstart(Mission(settings), '/mission', conf)
