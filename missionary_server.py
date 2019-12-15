@@ -100,7 +100,6 @@ class Missionary(object):
         if datetime.now() < self._start_date:
             return '0'
         duration = datetime.now() - self._start_date
-        print(type(duration))
         return str(duration.days)
 
     @cherrypy.expose
@@ -108,7 +107,6 @@ class Missionary(object):
         if self._release_date < datetime.now():
             return '0'
         duration = self._release_date - datetime.now()
-        print(type(duration))
         return str(duration.days)
 
 class Mission(object):
@@ -196,14 +194,14 @@ class Root(object):
 ROTATION_MAP = { 1: 'landscape', 6: 'portrait_right', 8: 'portrait_left', 3: 'upside'}
 
 def get_image_orientation(image_file_name):
-    print(image_file_name)
+    #print(image_file_name)
     with Image.open(image_file_name) as img:
         for orientation in ExifTags.TAGS.keys():
             if ExifTags.TAGS[orientation]=='Orientation':
                 break
         exif=dict(img._getexif().items())
-        print(exif[orientation])
-        print('W=%u, H=%u' % (img.width, img.height))
+        #print(exif[orientation])
+        #print('W=%u, H=%u' % (img.width, img.height))
         return ROTATION_MAP[exif[orientation]] if exif[orientation] in ROTATION_MAP else "unknown"
     return "unknown"
 
@@ -220,7 +218,6 @@ class SlideShow(object):
                 file_names.append('slides/' + file_name)
         file_name = random.choice(file_names)
         ret = {'file_name': file_name, 'orientation': get_image_orientation(file_name)}
-        print(file_name, ret)
         return json.dumps(ret)
 
 if __name__ == '__main__':
@@ -228,6 +225,10 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--daemonize', action='store_true', help='run as a daemon')
 
     args = parser.parse_args()
+
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
 
     with open('settings.json') as f:
         settings = json.loads(f.read())
@@ -249,6 +250,10 @@ if __name__ == '__main__':
         d.subscribe()
         PIDFile(cherrypy.engine, '/var/run/missionary_server.pid').subscribe()
         DropPrivileges(cherrypy.engine, uid=1000, gid=1000).subscribe()
+
+    cherrypy.config.update({'log.screen': False,
+                            'log.access_file': '',
+                            'log.error_file': ''})
 
     cherrypy.tree.mount(Root(settings), '/', conf)
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)

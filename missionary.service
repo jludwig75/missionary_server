@@ -1,0 +1,13 @@
+[Unit]
+Description=Missionary Server service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=missionary
+ExecStart=/usr/bin/env python3 /opt/missionary_server/missionary_server.py
+
+[Install]
+WantedBy=multi-user.target
