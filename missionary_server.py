@@ -8,6 +8,8 @@ import json
 import os
 import random
 from PIL import Image, ExifTags
+from cherrypy.process.plugins import Daemonizer, PIDFile, DropPrivileges
+import argparse
 
 USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
 USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
@@ -222,6 +224,11 @@ class SlideShow(object):
         return json.dumps(ret)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Missionary webserver')
+    parser.add_argument('-d', '--daemonize', action='store_true', help='run as a daemon')
+
+    args = parser.parse_args()
+
     with open('settings.json') as f:
         settings = json.loads(f.read())
     cherrypy.server.socket_host = '0.0.0.0'
@@ -236,6 +243,12 @@ if __name__ == '__main__':
             'tools.staticdir.dir': os.path.abspath('./slides')
         }
     }    
+
+    if args.daemonize:
+        d = Daemonizer(cherrypy.engine, stderr='/var/log/missionary_server.log')
+        d.subscribe()
+        PIDFile(cherrypy.engine, '/var/run/missionary_server.pid').subscribe()
+        DropPrivileges(cherrypy.engine, uid=1000, gid=1000).subscribe()
 
     cherrypy.tree.mount(Root(settings), '/', conf)
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
