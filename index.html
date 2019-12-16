@@ -2,6 +2,14 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script type="text/javascript">
+            function next_slide() {
+                $.get( "slideshow/next", function( data ) {
+                    var image_data = JSON.parse(data);
+                    var image_url = '<img id="slideshowimage" class="slideshowimage ' + image_data.orientation + '" src="' + image_data.file_name + '">';
+                    $('#slideframe').html(image_url);
+                    $("#slideshowimage").click(function() { next_slide() });
+                });
+            }
             function update_page() {
                 $('#missionary_name').load("missionary/name?title");
                 $('#mission_name').load("mission/name");
@@ -20,11 +28,7 @@
                         $('#time_of_day').html('<img class="time_of_day_image" src="static/nighttime.png">');
                     }
                 });
-                $.get( "slideshow/next", function( data ) {
-                    var image_data = JSON.parse(data);
-                    var image_url = '<img class="slideshowimage ' + image_data.orientation + '" src="' + image_data.file_name + '">';
-                    $('#slideframe').html(image_url);
-                });
+                next_slide();
             }
             $(document).ready(function(){
                 update_page();
