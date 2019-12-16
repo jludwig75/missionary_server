@@ -21,6 +21,9 @@
                 $('#humidity').load("mission/humidity");
                 $('#sunrise').load("mission/sunrise");
                 $('#sunset').load("mission/sunset");
+                $('#served').load("missionary/days_served");
+                $('#remaining').load("missionary/days_remaining");
+                $('#release_date').load("missionary/release_date");
                 $.get( "mission/time_of_day", function( data ) {
                     if (data == 'Daytime') {
                         $('#time_of_day').html('<img class="time_of_day_image" src="static/daytime.png">');
@@ -165,6 +168,23 @@
                 width: auto;
                 height: 6%;
             }
+            .service {
+                width: 100%;
+                height: 30%;
+                padding-top: 15%;
+            }
+            .served {
+                float:left;
+            }
+            .remaining {
+                float: right;
+            }
+            .remaining:after {
+                clear: both;
+            }
+            .service_days {
+                margin-top: 1em;
+            }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
@@ -228,6 +248,19 @@
                   <script src="https://maps.googleapis.com/maps/api/js?key=<<API_KEY>>&callback=initMap"
                   async defer></script>
                   <div class="assigned_area">Current Area: <span id="assigned_area">Manila MTC</span></div>
+                  <div class ="service">
+                    <div class="return_date">
+                        Return Date: <span id="release_date">11/11/111</span>
+                    </div>
+                    <div class="service_days">
+                        <div class="served">
+                            Days Served: <span id="served">0</span>
+                        </div>
+                        <div class="remaining">
+                            Days Remaining: <span id="remaining">0</span>
+                        </div>
+                    </div>
+                  </div>
             </div>
             <div class="slideshow">
                 <div id="slideframe" class="slideframe">
