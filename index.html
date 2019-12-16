@@ -81,27 +81,49 @@
             }
             .footer {
                 text-align: center;
+                height: 80%;
             }
             .map, .slideshow {
                 text-align: center;
             }
             .map {
-                width: 35%;
+                width: 30%;
             }
             .slideshow {
-                width: 65%;
+                width: 70%;
+                vertical-align: middle;
             }
             .mapframe, .slideframe {
-                margin: 20px;
+                margin: 10px;
+                height: 90%;
+            }
+            .slideframe {
+                vertical-align: middle;
+            }
+            .missionname, .mapframe, .assigned_area {
+                width: 70%;
+                margin-left: 15%;
+            }
+            .missionname {
+                font-size: 140%;
+                margin-top: 20px;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            .assigned_area {
+                font-size: 120%;
             }
             .mapframe {
-                height: 60%;
-                width: 70%;
-                margin-left: 20%;
+                height: 50%;
+                margin-top: 0.5em;
             }
             .slideshowimage {
                 width:auto;
-                height:60%;
+                height:100%;
+                vertical-align: middle;
+            }
+            .portrait_left, .portrait_right {
+                height: 75%;
             }
             .portrait_left {
                 transform: rotate(270deg);
@@ -111,6 +133,7 @@
             }
             .upside {
                 transform: rotate(180deg);
+                height:60%;
             }
             .datetimebox {
                 vertical-align: middle;
@@ -133,14 +156,11 @@
                 clear: both;
             }
             .missionaryname {
-                font-size: 200%;
-            }
-            .missionname {
-                font-size: 120%;
+                font-size: 180%;
             }
             .time_of_day_image {
                 width: auto;
-                height: 8%;
+                height: 6%;
             }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -153,7 +173,6 @@
                         <img src="static/karley2.jpg" style="width:auto;height:15%;">
                     </div>
                     <div id="missionary_name" class="missionaryname">Elder/Sister Missionary Name</div>
-                    <div class="missionname"><span id="mission_name">Mission Name</span> Mission</div>
                 </div>
             </div>
             <div class="times">
@@ -190,6 +209,7 @@
         </div>
         <div class="footer">
             <div class="map">
+                <div class="missionname"><span id="mission_name">Mission Name</span> Mission</div>
                 <div id="mapframe" class="mapframe">
                 </div>
                 <script>
@@ -203,8 +223,8 @@
                     }
                   </script>
                   <script src="https://maps.googleapis.com/maps/api/js?key=<<API_KEY>>&callback=initMap"
-                  async defer
-                  ></script>
+                  async defer></script>
+                  <div class="assigned_area">Current Area: <span id="assigned_area">Manila MTC</span></div>
             </div>
             <div class="slideshow">
                 <div id="slideframe" class="slideframe">
