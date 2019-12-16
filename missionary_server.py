@@ -152,6 +152,14 @@ class Mission(object):
             return 'unavailable'
     
     @cherrypy.expose
+    def conditions(self):
+        try:
+            cc = self._weather.current_conditions()
+            return cc['weather'][0]['description']
+        except:
+            return 'unavailable'
+
+    @cherrypy.expose
     def sunrise(self):
         try:
             cc = self._weather.current_conditions()
