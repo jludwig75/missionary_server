@@ -207,7 +207,11 @@ def get_image_orientation(image_file_name):
         for orientation in ExifTags.TAGS.keys():
             if ExifTags.TAGS[orientation]=='Orientation':
                 break
-        exif=dict(img._getexif().items())
+        try:
+            exif=dict(img._getexif().items())
+        except:
+            # If there is no EXIF data, go by the width to height of the image
+            return 'landscape' if img.width >= img.height else 'portrait_right'
         #print(exif[orientation])
         #print('W=%u, H=%u' % (img.width, img.height))
         return ROTATION_MAP[exif[orientation]] if exif[orientation] in ROTATION_MAP else "unknown"
