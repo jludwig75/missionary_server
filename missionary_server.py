@@ -10,6 +10,7 @@ import random
 from PIL import Image, ExifTags
 from cherrypy.process.plugins import Daemonizer, PIDFile, DropPrivileges
 import argparse
+from threading import Lock
 
 USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
 USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
@@ -220,15 +221,32 @@ def get_image_orientation(image_file_name):
 class SlideShow(object):
     def __init__(self, image_dir_path):
         self._image_dir_path = image_dir_path
+        self._lock = Lock()
 
-    @cherrypy.expose
-    def next(self):
-        file_names = []
+    # call with self._lock held
+    def _generate_image_list(self):
+        cherrypy.session['image_list'] = []
         for file_name in os.listdir(self._image_dir_path):
             extension = file_name.split('.')[-1]
             if extension.lower() in ['jpg', 'png']:
-                file_names.append('slides/' + file_name)
-        file_name = random.choice(file_names)
+                cherrypy.session['image_list'].append('slides/' + file_name)
+
+    # call with self._lock held
+    def _get_image_list(self):
+        if not 'image_list' in cherrypy.session or len(cherrypy.session['image_list']) == 0:
+            self._generate_image_list()
+        return cherrypy.session['image_list']
+
+    # call with self._lock held
+    def _remove_image_from_list(self, image_file_name):
+        cherrypy.session['image_list'].remove(image_file_name)
+
+    @cherrypy.expose
+    def next(self):
+        with self._lock:
+            file_name = random.choice(self._get_image_list())
+            self._remove_image_from_list(file_name)
+            # print('selected "%s" left: %s' % (file_name, str(cherrypy.session['image_list'])))
         ret = {'file_name': file_name, 'orientation': get_image_orientation(file_name)}
         return json.dumps(ret)
 
@@ -254,6 +272,9 @@ if __name__ == '__main__':
         '/slides': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': os.path.abspath('./slides')
+        },
+        '/': {
+            'tools.sessions.on': True
         }
     }    
 
@@ -263,9 +284,9 @@ if __name__ == '__main__':
         PIDFile(cherrypy.engine, '/var/run/missionary_server.pid').subscribe()
         DropPrivileges(cherrypy.engine, uid=1000, gid=1000).subscribe()
 
-    cherrypy.config.update({'log.screen': False,
-                            'log.access_file': '',
-                            'log.error_file': ''})
+    # cherrypy.config.update({'log.screen': False,
+    #                         'log.access_file': '',
+    #                         'log.error_file': ''})
 
     cherrypy.tree.mount(Root(settings), '/', conf)
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
