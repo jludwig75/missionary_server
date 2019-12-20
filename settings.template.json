@@ -1,6 +1,8 @@
 {
     "open_weather_map_key": "",
     "location": "Manila,ph",
+    "latitude": "10.41",
+    "longitude": "123.95",
     "timezone": "Asia/Manila",
     "mission_name": "",
     "missionary_name": "",

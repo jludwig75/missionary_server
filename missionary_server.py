@@ -114,7 +114,7 @@ class Mission(object):
     def __init__(self, settings):
         self._mission_name = settings['mission_name']
         self._missionary_tz = pytz.timezone(settings['timezone'])
-        self._weather = Weather(settings['open_weather_map_key'], settings['location'])
+        self._weather = Weather(settings['open_weather_map_key'], settings['location'], float(settings['latitude']), float(settings['longitude']))
 
     def _mission_time(self, t=None):
         utc_now = pytz.utc.localize(datetime.utcnow() if t == None else t)
