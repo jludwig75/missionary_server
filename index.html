@@ -2,6 +2,18 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script type="text/javascript">
+            const MSECS_PRE_SEC = 1000;
+            const SECS_PER_MIN = 60;
+            const MINS_PER_HOUR = 60;
+            function SECONDS(seconds) {
+                return seconds * MSECS_PRE_SEC;
+            }
+            function MINUTES(minutes) {
+                return SECONDS(minutes * SECS_PER_MIN);
+            }
+            function HOURS(hours) {
+                return MINUTES(hours * MINS_PER_HOUR);
+            }
             function next_slide() {
                 $.get( "slideshow/next", function( data ) {
                     var image_data = JSON.parse(data);
@@ -10,21 +22,13 @@
                     $("#slideshowimage").click(function() { next_slide() });
                 });
             }
-            function update_page() {
-                $('#missionary_name').load("missionary/name?title");
-                $('#mission_name').load("mission/name");
+            function update_10_seconds() {
                 $('#local_time').load("local/time");
                 $('#local_date').load("local/date");
                 $('#mission_time').load("mission/time");
                 $('#mission_date').load("mission/date");
-                $('#temperature').load("mission/temperature");
-                $('#humidity').load("mission/humidity");
-                $('#conditions').load("mission/conditions");
-                $('#sunrise').load("mission/sunrise");
-                $('#sunset').load("mission/sunset");
-                $('#served').load("missionary/days_served");
-                $('#remaining').load("missionary/days_remaining");
-                $('#release_date').load("missionary/release_date");
+            }
+            function update_1_minute() {
                 $.get( "mission/time_of_day", function( data ) {
                     if (data == 'Daytime') {
                         $('#time_of_day').html('<img class="time_of_day_image" src="static/daytime.png">');
@@ -32,11 +36,38 @@
                         $('#time_of_day').html('<img class="time_of_day_image" src="static/nighttime.png">');
                     }
                 });
+            }
+            function update_5_minutes() {
+                $('#temperature').load("mission/temperature");
+                $('#humidity').load("mission/humidity");
+                $('#conditions').load("mission/conditions");
+            }
+            function update_1_hour() {
+                $('#served').load("missionary/days_served");
+                $('#remaining').load("missionary/days_remaining");
+                $('#release_date').load("missionary/release_date");
+            }
+            function update_on_load() {
+                $('#missionary_name').load("missionary/name?title");
+                $('#mission_name').load("mission/name");
+                $('#sunrise').load("mission/sunrise");
+                $('#sunset').load("mission/sunset");
+            }
+            function update_page() {
+                update_on_load();
+                update_10_seconds();
+                update_1_minute();
+                update_5_minutes();
+                update_1_hour();
                 next_slide();
             }
             $(document).ready(function(){
                 update_page();
-                setInterval(update_page, 10000);
+                setInterval(update_10_seconds, SECONDS(10));
+                setInterval(update_1_minute, MINUTES(1));
+                setInterval(update_5_minutes, MINUTES(5));
+                setInterval(update_1_hour, HOURS(1));
+                setInterval(next_slide, SECONDS(10));
             });
         </script>
         <style>
