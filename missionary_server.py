@@ -11,6 +11,7 @@ from PIL import Image, ExifTags
 from cherrypy.process.plugins import Daemonizer, PIDFile, DropPrivileges
 import argparse
 from threading import Lock
+from photo_uploader import PhotoUploader
 
 USER_DATE_FORMAT = '%a, %b %d, %Y'  # Thu, Dec 12, 2019
 USER_TIME_FORMAT = '%I:%M %p' # 6:42 AM
@@ -219,6 +220,8 @@ def get_image_orientation(image_file_name):
     return "unknown"
 
 class SlideShow(object):
+    _SLIDESHOW_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
+    _IMAGE_LIST_KEY = 'image_list'
     def __init__(self, image_dir_path):
         self._image_dir_path = image_dir_path
         self._lock = Lock()
@@ -228,18 +231,18 @@ class SlideShow(object):
         cherrypy.session['image_list'] = []
         for file_name in os.listdir(self._image_dir_path):
             extension = file_name.split('.')[-1]
-            if extension.lower() in ['jpg', 'png']:
+            if extension.lower() in self._SLIDESHOW_FILE_EXTENSIONS:
                 cherrypy.session['image_list'].append('slides/' + file_name)
 
     # call with self._lock held
     def _get_image_list(self):
-        if not 'image_list' in cherrypy.session or len(cherrypy.session['image_list']) == 0:
+        if not self._IMAGE_LIST_KEY in cherrypy.session or len(cherrypy.session[self._IMAGE_LIST_KEY]) == 0:
             self._generate_image_list()
-        return cherrypy.session['image_list']
+        return cherrypy.session[self._IMAGE_LIST_KEY]
 
     # call with self._lock held
     def _remove_image_from_list(self, image_file_name):
-        cherrypy.session['image_list'].remove(image_file_name)
+        cherrypy.session[self._IMAGE_LIST_KEY].remove(image_file_name)
 
     @cherrypy.expose
     def next(self):
@@ -292,4 +295,5 @@ if __name__ == '__main__':
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
     cherrypy.tree.mount(Local(settings), '/local')
     cherrypy.tree.mount(Missionary(settings), '/missionary')
+    cherrypy.tree.mount(PhotoUploader(os.path.abspath('./slides')), '/photos', conf)
     cherrypy.quickstart(Mission(settings), '/mission', conf)

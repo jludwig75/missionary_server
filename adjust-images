@@ -5,6 +5,7 @@ from PIL import Image, ExifTags
 
 
 TARGET_WIDTH_TO_HEIGHT_RATIO = 4.0 / 3.0
+IMAGE_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
 
 class IMG_ORIENTATION:
     Landscape = 1
@@ -84,7 +85,7 @@ def adjust_images(image_dir_path):
     file_names = os.listdir(image_dir_path)
     for file_name in file_names:
         extension = file_name.split('.')[-1]
-        if extension.lower() in ['jpg', 'png']:
+        if extension.lower() in IMAGE_FILE_EXTENSIONS:
             adjust_image(os.path.join(image_dir_path, file_name))
 
 dir_path = '.'
