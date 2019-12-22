@@ -2,6 +2,48 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script type="text/javascript">
+            var map_zoom;
+            var mission_lat;
+            var mission_lon;
+            var missionary_lat;
+            var missionary_lon;
+            var load_map = 0;
+            function on_map_event() {
+                if (typeof map_zoom != 'undefined' &&
+                typeof mission_lat != 'undefined' &&
+                typeof mission_lon != 'undefined' &&
+                typeof missionary_lat != 'undefined' &&
+                typeof missionary_lon != 'undefined' &&
+                load_map != 0) {
+                    map = new google.maps.Map(document.getElementById('mapframe'), {
+                       center: {lat: mission_lat, lng: mission_lon},
+                        zoom: map_zoom
+                      });
+                    // TODO: This should be retrieved from somewhere.
+                    var marker_manila_mtc = new google.maps.Marker({position: {lat: 14.6005807, lng: 121.0678641}, map: map});
+                    var marker_current_location = new google.maps.Marker({position: {lat: missionary_lat, lng: missionary_lon}, map: map});
+                }
+            }
+            $.get("mission/map_zoom", function(data) {
+                map_zoom = parseInt(data, 10);
+                on_map_event();
+            });
+            $.get("mission/center_lat", function(data) {
+                mission_lat = parseFloat(data);
+                on_map_event();
+            });
+            $.get("mission/center_lon", function(data) {
+                mission_lon = parseFloat(data);
+                on_map_event();
+            });
+            $.get("missionary/latitude", function(data) {
+                missionary_lat = parseFloat(data);
+                on_map_event();
+            });
+            $.get("missionary/longitude", function(data) {
+                missionary_lon = parseFloat(data);
+                on_map_event();
+            });
             const MSECS_PRE_SEC = 1000;
             const SECS_PER_MIN = 60;
             const MINS_PER_HOUR = 60;
@@ -46,6 +88,7 @@
                 $('#served').load("missionary/days_served");
                 $('#remaining').load("missionary/days_remaining");
                 $('#release_date').load("missionary/release_date");
+                $('#assigned_area').load("missionary/assigned_area");
             }
             function update_on_load() {
                 $('#missionary_name').load("missionary/name?title");
@@ -279,17 +322,13 @@
                 <script>
                     var map;
                     function initMap() {
-                      map = new google.maps.Map(document.getElementById('mapframe'), {
-                       center: {lat: 10.5046, lng: 124.0790},
-                        zoom: 8
-                      });
-                      var marker = new google.maps.Marker({position: {lat: 14.6005807, lng:121.0678641}, map: map});
-                      var marker2 = new google.maps.Marker({position: {lat: 10.400936, lng:123.9912528}, map: map});
+                        load_map = 1;
+                        on_map_event();
                     }
                   </script>
                   <script src="https://maps.googleapis.com/maps/api/js?key=<<API_KEY>>&callback=initMap"
                   async defer></script>
-                  <div class="assigned_area">Current Area: <span id="assigned_area">Liloan, Philippines</span></div>
+                  <div class="assigned_area">Current Area: <span id="assigned_area">Current Area</span></div>
                   <div class ="service">
                     <div class="return_date">
                         Return Date: <span id="release_date">11/11/111</span>

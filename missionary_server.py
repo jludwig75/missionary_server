@@ -57,6 +57,8 @@ class Local(object):
 class Missionary(object):
     def __init__(self, settings):
         self._missionary_name = settings['missionary_name']
+        self._coords = ((float(settings['latitude']), float(settings['longitude'])))
+        self._assigned_area = settings['current_area']
 
         gender = settings['missionary_gender'].upper()
         if gender == 'M':
@@ -111,11 +113,25 @@ class Missionary(object):
         duration = self._release_date - datetime.now()
         return str(duration.days)
 
+    @cherrypy.expose
+    def latitude(self):
+        return str(self._coords[0])
+
+    @cherrypy.expose
+    def longitude(self):
+        return str(self._coords[1])
+
+    @cherrypy.expose
+    def assigned_area(self):
+        return self._assigned_area
+
 class Mission(object):
     def __init__(self, settings):
         self._mission_name = settings['mission_name']
         self._missionary_tz = pytz.timezone(settings['timezone'])
         self._weather = Weather(settings['open_weather_map_key'], settings['location'], float(settings['latitude']), float(settings['longitude']))
+        self._center_coords = ((float(settings['mission_center_lat']), float(settings['mission_center_lon'])))
+        self._map_zoom = int(settings['mission_map_zoom'])
 
     def _mission_time(self, t=None):
         utc_now = pytz.utc.localize(datetime.utcnow() if t == None else t)
@@ -191,6 +207,18 @@ class Mission(object):
             return "Daytime" if now >= sunrise and now <= sunset else "Night"
         except:
             return 'unavailable'
+
+    @cherrypy.expose
+    def center_lat(self):
+        return str(self._center_coords[0])
+
+    @cherrypy.expose
+    def center_lon(self):
+        return str(self._center_coords[1])
+
+    @cherrypy.expose
+    def map_zoom(self):
+        return str(self._map_zoom)
 
 class Root(object):
     def __init__(self, settings):
