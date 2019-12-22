@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js"></script>
+        <script type="text/javascript">
+            function setup_field_form(field_name) {
+                $("#" + field_name + "_edit").hide();
+                $("#" + field_name + "_show").load(field_name, function() {
+                    $("#" + field_name + "_show").click(function(){
+                        var val = $("#" + field_name + "_show").text();
+                        $("#" + field_name + "_show").hide();
+                        $("#" + field_name + "_edit").show();
+                        $("#" + field_name + "_input").val(val);
+                        $("#" + field_name + "_input").focus();
+                        $("#" + field_name + "_input").select();
+                        $("#" + field_name).ajaxForm(function() {
+                            $("#" + field_name + "_edit").hide();
+                            $("#" + field_name + "_show").show();
+                            $("#" + field_name + "_show").load(field_name);
+                        });
+                    });
+                });
+            }
+            $(document).ready(function(){
+                <<FORM_SETUP_LIST>>
+            });
+        </script>
+        <style>
+            .settings_field {
+                margin-left: 1em;
+            }
+            .name_field {
+                width: 200em;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <h2>Settings</h2>
+        <<FIELD_LIST>>
+    </body>
+</html>
+    
