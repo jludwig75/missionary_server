@@ -65,19 +65,21 @@ def adjust_image(image_file_path):
     print('adjusting image %s' % image_file_path)
     img = Image.open(image_file_path)
     orientation = get_image_orientation(img)
-    
+
     if orientation == IMG_ORIENTATION.Landscape:
         # nothing to do
         print('  no adjustments needed to %s' % image_file_path)
         return
     
     # correct the rotation
-    img = correct_image_rotation(img, orientation)
+    file_name = image_file_path.split('/')[-1]
+    if not file_name.startswith('FB_IMG_'):
+        img = correct_image_rotation(img, orientation)
     
     # pad to landscape
     if orientation in [IMG_ORIENTATION.PortraitLeft, IMG_ORIENTATION.PortraitRight]:
         img = pad_image_to_landscape(img)
-    
+
     # save image
     save_image(img, image_file_path)
 
