@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+import sys
+import os
+from PIL import Image, ExifTags
+
+IMAGE_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
+TARGET_HEIGHT = 960
+
+def resize_image(image_file_path):
+    print('Resizing %s' % image_file_path)
+    img = Image.open(image_file_path)
+    if img.height > img.width:
+        # skip for now
+        print('  skipping portrait image %s' % image_file_path)
+        return
+    if img.height <= TARGET_HEIGHT:
+        # nothing to do
+        print('  skipping %s: already small enough' % image_file_path)
+        return
+    new_width = int((img.width * TARGET_HEIGHT) / img.height)
+    img = img.resize((new_width, TARGET_HEIGHT), Image.LANCZOS)
+    last_dot = image_file_path.rfind('.')
+    # new_file_name = image_file_path[:last_dot] + '_resized' + image_file_path[last_dot:]
+    img.save(image_file_path)
+
+def resize_images(image_dir_path):
+    file_names = os.listdir(image_dir_path)
+    for file_name in file_names:
+        extension = file_name.split('.')[-1]
+        if extension.lower() in IMAGE_FILE_EXTENSIONS:
+            resize_image(os.path.join(image_dir_path, file_name))
+
+dir_path = '.'
+if len(sys.argv) > 1:
+    dir_path = sys.argv[1]
+
+resize_images(dir_path)
