@@ -4,9 +4,6 @@ import timeformat
 
 
 class Local(object):
-    def __init__(self, settings):
-        pass
-
     def _local_time(self):
         return datetime.now()
 

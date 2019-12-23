@@ -6,11 +6,15 @@ import timeformat
 
 class Mission(object):
     def __init__(self, settings):
-        self._mission_name = settings['mission_name']
-        self._missionary_tz = pytz.timezone(settings['timezone'])
-        self._weather = Weather(settings['open_weather_map_key'], settings['location'], float(settings['latitude']), float(settings['longitude']))
-        self._center_coords = ((float(settings['mission_center_lat']), float(settings['mission_center_lon'])))
-        self._map_zoom = int(settings['mission_map_zoom'])
+        self._settings = settings
+
+    @property
+    def _weather(self):
+        return Weather(self._settings.get_setting('open_weather_map_key'), self._settings.get_setting('location'), float(self._settings.get_setting('latitude')), float(self._settings.get_setting('longitude')))
+
+    @property
+    def _missionary_tz(self):
+        return pytz.timezone(self._settings.get_setting('timezone'))
 
     def _mission_time(self, t=None):
         utc_now = pytz.utc.localize(datetime.utcnow() if t == None else t)
@@ -18,7 +22,7 @@ class Mission(object):
 
     @cherrypy.expose
     def name(self):
-        return self._mission_name
+        return self._settings.get_setting('mission_name')
 
     @cherrypy.expose
     def time(self):
@@ -85,13 +89,13 @@ class Mission(object):
 
     @cherrypy.expose
     def center_lat(self):
-        return str(self._center_coords[0])
+        return str(self._settings.get_setting('mission_center_lat'))
 
     @cherrypy.expose
     def center_lon(self):
-        return str(self._center_coords[1])
+        return str(self._settings.get_setting('mission_center_lon'))
 
     @cherrypy.expose
     def map_zoom(self):
-        return str(self._map_zoom)
+        return str(self._settings.get_setting('mission_map_zoom'))
 

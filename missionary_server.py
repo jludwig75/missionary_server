@@ -14,7 +14,12 @@ from settings import Settings
 
 class Root(object):
     def __init__(self, settings):
-        self._map_key = settings['maps_api_key']
+        self._settings = settings
+
+    @property
+    def _map_key(self):
+        return self._settings.get_setting('maps_api_key')
+
     @cherrypy.expose
     def index(self):
         with open('index.html') as f:
@@ -31,8 +36,6 @@ if __name__ == '__main__':
     dname = os.path.dirname(abspath)
     os.chdir(dname)
 
-    with open('settings.json') as f:
-        settings = json.loads(f.read())
     cherrypy.server.socket_host = '0.0.0.0'
 
     conf = {
@@ -59,11 +62,11 @@ if __name__ == '__main__':
     #                         'log.access_file': '',
     #                         'log.error_file': ''})
 
-    settings_obj = Settings('settings.json')
+    settings = Settings('settings.json')
     cherrypy.tree.mount(Root(settings), '/', conf)
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
-    cherrypy.tree.mount(Local(settings), '/local')
-    cherrypy.tree.mount(Missionary(settings_obj), '/missionary')
+    cherrypy.tree.mount(Local(), '/local')
+    cherrypy.tree.mount(Missionary(settings), '/missionary')
     cherrypy.tree.mount(PhotoUploader(os.path.abspath('./slides')), '/photos', conf)
-    cherrypy.tree.mount(Settings('settings.json'), '/settings', conf)
+    cherrypy.tree.mount(settings, '/settings', conf)
     cherrypy.quickstart(Mission(settings), '/mission', conf)

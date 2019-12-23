@@ -125,12 +125,24 @@ class Settings(object):
         return self._setting_handler('current_area', current_area)
 
     @cherrypy.expose
-    def latitude(self, latitude=None):
-        return self._setting_handler('latitude', latitude)
+    def current_area_latitude(self, current_area_latitude=None):
+        return self._setting_handler('latitude', current_area_latitude)
 
     @cherrypy.expose
-    def longitude(self, longitude=None):
-        return self._setting_handler('longitude', longitude)
+    def current_area_longitude(self, current_area_longitude=None):
+        return self._setting_handler('longitude', current_area_longitude)
+
+    @cherrypy.expose
+    def mission_map_zoom_level(self, mission_map_zoom_level=None):
+        return self._setting_handler('mission_map_zoom', mission_map_zoom_level)
+
+    @cherrypy.expose
+    def timezone(self, timezone=None):
+        return self._setting_handler('timezone', timezone)
+
+    @cherrypy.expose
+    def weather_location(self, weather_location=None):
+        return self._setting_handler('location', weather_location)
 
     @cherrypy.expose
     def start_date(self, start_date=None):
@@ -139,6 +151,26 @@ class Settings(object):
     @cherrypy.expose
     def release_date(self, release_date=None):
         return self._setting_handler('release_date', release_date)
+
+    @cherrypy.expose
+    def mission_name(self, mission_name=None):
+        return self._setting_handler('mission_name', mission_name)
+
+    @cherrypy.expose
+    def open_weather_map_key(self, open_weather_map_key=None):
+        return self._setting_handler('open_weather_map_key', open_weather_map_key)
+
+    @cherrypy.expose
+    def google_maps_api_key(self, google_maps_api_key=None):
+        return self._setting_handler('maps_api_key', google_maps_api_key)
+
+    @cherrypy.expose
+    def mission_center_latitude(self, mission_center_latitude=None):
+        return self._setting_handler('mission_center_lat', mission_center_latitude)
+
+    @cherrypy.expose
+    def mission_center_longitude(self, mission_center_longitude=None):
+        return self._setting_handler('mission_center_lon', mission_center_longitude)
 
     def get_setting(self, key):
         with self._settings_lock:
