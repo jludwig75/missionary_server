@@ -2,15 +2,21 @@
 
 import cherrypy
 from cherrypy.lib import static
+import inspect
 
 
 class Settings(object):
     def __init__(self):
         self._field_list = []
-        self._add_field('first_name')
-        self._add_field('last_name')
-        self._add_field('city')
-        self._add_field('zip_code')
+        self._find_fields()
+
+    def _find_fields(self):
+        class_functions = inspect.getmembers(Settings, predicate=inspect.isfunction)
+        for function_name, function in class_functions:
+            if hasattr(function, 'exposed') and function.exposed and function_name != 'index':#method[0] != 'index' and not method[0].startswith('_'):
+                args = inspect.getargspec(function).args
+                if len(args) == 2 and args[1] == function_name:
+                    self._add_field(function_name)
 
     def _add_field(self, field_name):
         self._field_list.append(field_name)
@@ -24,7 +30,6 @@ class Settings(object):
                 display_name += c.upper()
             else:
                 display_name += c
-        print('display name', display_name)
         return display_name
 
     def _generate_field_form(self, field_name):
@@ -38,11 +43,9 @@ class Settings(object):
             html += self._generate_field_form(field_name)
         return html
 
-    def _setup_list(self):
-        js = ''
-        for field_name in self._field_list:
-            js += 'setup_field_form("%s");\n' % field_name
-        return js
+    @cherrypy.expose
+    def hello(self):
+        return 'Hello!'
 
     @cherrypy.expose
     def index(self):
@@ -52,7 +55,7 @@ class Settings(object):
         cherrypy.session['zip_code'] = '84601'
         with open('settings.html') as f:
             html = f.read()
-        return html.replace('<<FIELD_LIST>>', self._field_list_html()).replace('<<FORM_SETUP_LIST>>', self._setup_list())
+        return html.replace('<<FIELD_LIST>>', self._field_list_html())
 
     @cherrypy.expose
     def first_name(self, first_name=None):
