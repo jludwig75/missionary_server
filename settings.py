@@ -2,13 +2,56 @@
 
 import cherrypy
 from cherrypy.lib import static
+import json
 import inspect
+from threading import Lock
 
 
 class Settings(object):
-    def __init__(self):
+    def __init__(self, settings_file_name):
         self._field_list = []
         self._find_fields()
+        self._settings_file_name = settings_file_name
+        self._settings = None
+        self._settings_lock = Lock()
+    
+    # call with self._settings_lock held
+    def _load_settings(self):
+        with open(self._settings_file_name) as f:
+            return json.loads(f.read())
+
+    # call with self._settings_lock held
+    def _save_settings(self, settings):
+        with open(self._settings_file_name, 'wt') as f:
+            text = json.dumps(settings)
+            text = ',\n"'.join(text.split(', "'))
+            f.write(text)
+
+    def _get_setting(self, key):
+        with self._settings_lock:
+            try:
+                settings = self._load_settings()
+                if not key in settings:
+                    return None
+                return settings[key]
+            except:
+                return None
+            
+    # implemented as test-and-set
+    def _update_setting(self, key, old_value, new_value):
+        with self._settings_lock:
+            try:
+                settings = self._load_settings()
+                # Don't allow adding new keys
+                if not key in settings or settings[key] != old_value:
+                    return False
+                settings[key] = new_value
+                self._save_settings(settings)
+                print('Successfully saved settings')
+                return True
+            except Exception as e:
+                print('Error saving settings: %s' % str(e))
+                return False
 
     def _find_fields(self):
         class_functions = inspect.getmembers(Settings, predicate=inspect.isfunction)
@@ -44,50 +87,65 @@ class Settings(object):
         return html
 
     @cherrypy.expose
-    def hello(self):
-        return 'Hello!'
-
-    @cherrypy.expose
     def index(self):
-        cherrypy.session['first_name'] = 'John'
-        cherrypy.session['last_name'] = 'Smith'
-        cherrypy.session['city'] = 'Provo'
-        cherrypy.session['zip_code'] = '84601'
         with open('settings.html') as f:
             html = f.read()
         return html.replace('<<FIELD_LIST>>', self._field_list_html())
 
-    @cherrypy.expose
-    def first_name(self, first_name=None):
+    def _setting_get(self, key):
+        print(key)
+        value = self._get_setting(key)
+        cherrypy.session[key] = value
+        print(key, value)
+        return value
+
+    def _setting_post(self, key, value):
+        if value != None:
+            print('updating %s to %s' % (key, value))
+            if self._update_setting(key, cherrypy.session[key], value):
+                cherrypy.session[key] = value
+
+    def _setting_handler(self, key, new_value):
+        print(cherrypy.request.method, key, new_value)
         if cherrypy.request.method == 'GET':
-            return cherrypy.session['first_name']
+            return self._setting_get(key)
         if cherrypy.request.method == 'POST':
-            if first_name != None:
-                cherrypy.session['first_name'] = first_name
+            self._setting_post(key, new_value)
 
     @cherrypy.expose
-    def last_name(self, last_name=None):
-        if cherrypy.request.method == 'GET':
-            return cherrypy.session['last_name']
-        if cherrypy.request.method == 'POST':
-            if last_name != None:
-                cherrypy.session['last_name'] = last_name
+    def missionary_name(self, missionary_name=None):
+        return self._setting_handler('missionary_name', missionary_name)
 
     @cherrypy.expose
-    def city(self, city=None):
-        if cherrypy.request.method == 'GET':
-            return cherrypy.session['city']
-        if cherrypy.request.method == 'POST':
-            if city != None:
-                cherrypy.session['city'] = city
+    def missionary_gender(self, missionary_gender=None):
+        return self._setting_handler('missionary_gender', missionary_gender)
 
     @cherrypy.expose
-    def zip_code(self, zip_code=None):
-        if cherrypy.request.method == 'GET':
-            return cherrypy.session['zip_code']
-        if cherrypy.request.method == 'POST':
-            if zip_code != None:
-                cherrypy.session['zip_code'] = zip_code
+    def current_area(self, current_area=None):
+        return self._setting_handler('current_area', current_area)
+
+    @cherrypy.expose
+    def latitude(self, latitude=None):
+        return self._setting_handler('latitude', latitude)
+
+    @cherrypy.expose
+    def longitude(self, longitude=None):
+        return self._setting_handler('longitude', longitude)
+
+    @cherrypy.expose
+    def start_date(self, start_date=None):
+        return self._setting_handler('start_date', start_date)
+
+    @cherrypy.expose
+    def release_date(self, release_date=None):
+        return self._setting_handler('release_date', release_date)
+
+    def get_setting(self, key):
+        with self._settings_lock:
+            settings = self._load_settings()
+            if not key in settings:
+                return None
+            return settings[key]
 
 if __name__ == '__main__':
     # CherryPy always starts with app.root when trying to map request URIs
@@ -98,4 +156,4 @@ if __name__ == '__main__':
             'tools.sessions.on': True
         }
     }
-    cherrypy.quickstart(Settings(), '/settings', conf)
+    cherrypy.quickstart(Settings('settings.json'), '/settings', conf)

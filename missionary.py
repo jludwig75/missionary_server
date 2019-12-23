@@ -14,30 +14,10 @@ class Gender:
 
 class Missionary(object):
     def __init__(self, settings):
-        self._missionary_name = settings['missionary_name']
-        self._coords = ((float(settings['latitude']), float(settings['longitude'])))
-        self._assigned_area = settings['current_area']
-
-        gender = settings['missionary_gender'].upper()
-        if gender == 'M':
-            self._gender = Gender.Male
-        else:
-            assert gender == 'F'
-            self._gender = Gender.Female
-
-        try:
-            self._start_date = timeformat.format_date_time(settings['start_date'])
-        except:
-            self._start_date = datetime.now()
-
-        try:
-            self._release_date = timeformat.format_date_time(settings['release_date'])
-        except:
-            days = 2 * 365 if self._gender == Gender.Male else 365 + 365 / 2
-            self._release_date = self._start_date + timedelta(days=days)
+        self._settings = settings
 
     def _missionary_title(self):
-        return 'Elder' if self._gender == Gender.Male else 'Sister'
+        return 'Elder' if self._settings.get_setting('missionary_gender')[0].upper() == 'M' else 'Sister'
 
     @cherrypy.expose
     def index(self):
@@ -46,42 +26,43 @@ class Missionary(object):
     @cherrypy.expose
     def name(self, title=None):
         if title == None:
-            return self._missionary_name
-        return '%s %s' % (self._missionary_title(), self._missionary_name)
+            return self._settings.get_setting('missionary_name')
+        return '%s %s' % (self._missionary_title(), self._settings.get_setting('missionary_name'))
 
     @cherrypy.expose
     def start_date(self):
-        return timeformat.user_date_format(self._start_date)
+        return timeformat.user_date_format(timeformat.parse_settings_date_time(self._settings.get_setting('start_date')))
 
     @cherrypy.expose
     def release_date(self):
-        return timeformat.user_date_format(self._release_date)
+        return timeformat.user_date_format(timeformat.parse_settings_date_time(self._settings.get_setting('release_date')))
 
     @cherrypy.expose
     def days_served(self):
-        print(self._start_date)
-        if datetime.now() < self._start_date:
+        start_date = timeformat.parse_settings_date_time(self._settings.get_setting('start_date'))
+        if datetime.now() < start_date:
             return '0'
-        duration = datetime.now() - self._start_date
+        duration = datetime.now() - start_date
         return str(duration.days)
 
     @cherrypy.expose
     def days_remaining(self):
-        print(self._release_date)
-        if self._release_date < datetime.now():
+        release_date = timeformat.parse_settings_date_time(self._settings.get_setting('release_date'))
+        if release_date < datetime.now():
             return '0'
-        duration = self._release_date - datetime.now()
+        duration = release_date - datetime.now()
         return str(duration.days)
 
     @cherrypy.expose
     def latitude(self):
-        return str(self._coords[0])
+        return str(self._settings.get_setting('latitude'))
 
     @cherrypy.expose
     def longitude(self):
-        return str(self._coords[1])
+        return str(self._settings.get_setting('longitude'))
 
     @cherrypy.expose
     def assigned_area(self):
-        return self._assigned_area
+        print('assigned area handler')
+        return self._settings.get_setting('current_area')
 

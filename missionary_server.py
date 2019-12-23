@@ -10,6 +10,7 @@ from local import Local
 from mission import Mission
 from missionary import Missionary
 from slideshow import SlideShow
+from settings import Settings
 
 class Root(object):
     def __init__(self, settings):
@@ -58,9 +59,11 @@ if __name__ == '__main__':
     #                         'log.access_file': '',
     #                         'log.error_file': ''})
 
+    settings_obj = Settings('settings.json')
     cherrypy.tree.mount(Root(settings), '/', conf)
     cherrypy.tree.mount(SlideShow('./slides'), '/slideshow', conf)
     cherrypy.tree.mount(Local(settings), '/local')
-    cherrypy.tree.mount(Missionary(settings), '/missionary')
+    cherrypy.tree.mount(Missionary(settings_obj), '/missionary')
     cherrypy.tree.mount(PhotoUploader(os.path.abspath('./slides')), '/photos', conf)
+    cherrypy.tree.mount(Settings('settings.json'), '/settings', conf)
     cherrypy.quickstart(Mission(settings), '/mission', conf)

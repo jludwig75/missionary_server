@@ -13,5 +13,5 @@ def user_time_format(dt):
     # remove any leading pad 0's from time (except after :'s)
     return dt.strftime(_USER_TIME_FORMAT).lstrip("0").replace(" 0", " ")
 
-def format_date_time(date_time):
+def parse_settings_date_time(date_time):
     return datetime.strptime(date_time, _SETTINGS_FILE_DATE_FORMAT)
