@@ -18,22 +18,11 @@ class PhotoUploader(object):
     @cherrypy.expose
     def index(self):
         upload_message = cherrypy.session[self.UPLOAD_MSG_KEY] if self.UPLOAD_MSG_KEY in cherrypy.session else ''
-        msg = """
-        <html>
-            <body>
-            <p>%s</p>
-            <h2>Upload New Photos</h2>
-                <form action="upload" method="post" enctype="multipart/form-data">
-                    <input value="Select Photos" type="file" name="myFiles" accept="image/*" multiple/><br />
-                    <input value="Upload" type="submit" />
-                </form>
-                <a href="/">Home</a>
-            </body>
-        </html>
-        """ % upload_message
         if self.UPLOAD_MSG_KEY in cherrypy.session:
             del cherrypy.session[self.UPLOAD_MSG_KEY]
-        return msg
+        with open('photos.html') as f:
+            html = f.read()
+        return html.replace('<<UPLOAD_MESSAGE>>', upload_message)
 
     @cherrypy.expose
     def upload(self, myFiles):
@@ -53,7 +42,7 @@ class PhotoUploader(object):
 
             files_uploaded += 1
 
-        cherrypy.session[self.UPLOAD_MSG_KEY] = '%u of %u files successfully uploaded' % (files_sent, files_uploaded)
+        cherrypy.session[self.UPLOAD_MSG_KEY] = '<p>%u of %u files successfully uploaded</p>' % (files_sent, files_uploaded)
         raise cherrypy.HTTPRedirect(cherrypy.url('.'))
 
 if __name__ == '__main__':

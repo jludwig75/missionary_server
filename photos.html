@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <style>
+            .header {
+                text-align: left;
+                height: 12%;
+                margin-bottom: 0.5em;
+                border-bottom: solid;
+                border-color: black;
+                border-width: 1;
+                padding-bottom: 0.5em;
+            }
+            h3 {
+                margin-bottom: 0.3em;
+            }
+            .upload_form {
+                margin-bottom: 0.3em;
+            }
+            .header:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            .main {
+                border-style: solid;
+                border-width: 1;
+                border: black;
+            }
+            .image_view {
+                height: 66%;
+            }
+            .image_selector {
+                height: 20%;
+                overflow: auto;
+                overflow-y: hidden;
+                -ms-overflow-y: hidden;
+            }
+            .image_menu {
+                float: left;
+                width: 20%;
+                height: 100%;
+            }
+            .image_display {
+                width: 80%;
+                height: 100%;
+                float: left;
+            }
+            .image_displa:after {
+                clear: both;
+            }
+            .selected_image {
+                height: 100%;
+            }
+            button, input {
+                margin: 0.25em;
+            }
+            .thumbnail {
+                height: 100px;
+                width: 133px;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div class="header">
+            <<UPLOAD_MESSAGE>>
+            <h3>Upload New Photos</h3>
+                <form class="upload_form" action="upload" method="post" enctype="multipart/form-data">
+                    <input value="Select Photos" type="file" name="myFiles" accept="image/*" multiple/><br />
+                    <input value="Upload" type="submit" />
+            </form>
+            <a href="/">Home</a>
+        </div>
+        <div class="main">
+            <div class="image_view">
+                <div class="image_menu">
+                    <h3>Image Options</h3>
+                    <button>Delete</button><br/>
+                    <button>Rotate</button>
+                </div>
+                <div class="image_display">
+                    <img class="selected_image" src="">
+                </div>
+            </div>
+            <div class="image_selector">
+                <h3>Select Image</h3>
+                <img class="thumbnail" src="">
+            </div>
+        </div>
+</body>
+</html>
+    
