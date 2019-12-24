@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+import sys
+import os
+from PIL import Image, ExifTags
+
+IMAGE_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
+TARGET_HEIGHT = 120
+
+def make_thumbnail(image_file_path, output_dir_path):
+    print('Creating thumbnail of %s' % image_file_path)
+    img = Image.open(image_file_path)
+    if img.height > img.width:
+        # skip for now
+        print('  skipping portrait image %s' % image_file_path)
+        return
+    name_parts = image_file_path.split('.')
+    base_name = '.'.join(name_parts[:-1])
+    extension = name_parts[-1]
+    thumbnail_name = base_name + '_thumb.' + extension
+    thumbnail_name = os.path.join(output_dir_path, os.path.split(thumbnail_name)[1])
+    if os.path.exists(thumbnail_name):
+        print('  thumbnail of %s already exists' % image_file_path)
+        return
+    print('  creating thumbnail %s of %s' % (thumbnail_name, image_file_path))
+    new_width = int((img.width * TARGET_HEIGHT) / img.height)
+    img = img.resize((new_width, TARGET_HEIGHT), Image.LANCZOS)
+    img.save(thumbnail_name)
+
+def make_image_thumbnails(image_dir_path, output_dir_path):
+    file_names = os.listdir(image_dir_path)
+    for file_name in file_names:
+        extension = file_name.split('.')[-1]
+        if extension.lower() in IMAGE_FILE_EXTENSIONS and not '_thumb' in file_name:
+            make_thumbnail(os.path.join(image_dir_path, file_name), output_dir_path)
+
+dir_path = '.'
+output_dir_path = '.'
+if len(sys.argv) > 1:
+    dir_path = sys.argv[1]
+
+if len(sys.argv) > 2:
+    output_dir_path = sys.argv[2]
+
+make_image_thumbnails(dir_path, output_dir_path)
