@@ -35,13 +35,29 @@ class PhotoUploader(object):
         list_html = ''
         first_element = True
         for image in image_list:
-            list_html += '<img class="thumbnail%s" src="slides/thumbnails/%s" data-image-path="%s">' % (' thumbnail_selected' if first_element else '', image[1], image[0])
+            list_html += '<img id="%s" class="thumbnail%s" src="slides/thumbnails/%s" data-image-path="%s">' % (image[0].split('.')[0], ' thumbnail_selected' if first_element else '', image[1], image[0])
             first_element = False
         return list_html
 
+    def _get_image_list_index(self, image_file_name):
+        image_list_length = len(cherrypy.session[self.IMAGE_LIST_KEY])
+        if image_list_length == 0:
+            return -1
+        print(image_file_name)
+        print(cherrypy.session[self.IMAGE_LIST_KEY])
+        return next(i for i, x in enumerate(cherrypy.session[self.IMAGE_LIST_KEY]) if x[0] == image_file_name)
+
+    def _get_image_num(self, i):
+        return cherrypy.session[self.IMAGE_LIST_KEY][i][0]
+        
+    def _num_images(self):
+        return len(cherrypy.session[self.IMAGE_LIST_KEY])
+
+    IMAGE_LIST_KEY = 'image_list'
     @cherrypy.expose
     def index(self):
         image_list = self._generate_image_list()
+        cherrypy.session[self.IMAGE_LIST_KEY] = image_list
         image_selection_html = self._generate_image_selection_list(image_list)
         upload_message = cherrypy.session[self.UPLOAD_MSG_KEY] if self.UPLOAD_MSG_KEY in cherrypy.session else ''
         if self.UPLOAD_MSG_KEY in cherrypy.session:
@@ -50,7 +66,24 @@ class PhotoUploader(object):
             html = f.read()
         return html.replace('<<UPLOAD_MESSAGE>>', upload_message). \
                 replace('<<IMAGE_SELECTION_LIST>>', image_selection_html). \
-                replace('<<SELECTED_IMAGE_PATH>>', 'slides/%s' % image_list[0][0])
+                replace('<<SELECTED_IMAGE_PATH>>', 'slides/%s' % image_list[0][0]). \
+                replace('<<SELECTED_IMAGE_FILE_NAME>>', image_list[0][0])
+
+    @cherrypy.expose
+    def next(self, image_file_name):
+        i = self._get_image_list_index(image_file_name)
+        i += 1
+        if i >= self._num_images():
+            i = 0
+        return self._get_image_num(i)
+
+    @cherrypy.expose
+    def previous(self, image_file_name):
+        i = self._get_image_list_index(image_file_name)
+        i -= 1
+        if i < 0:
+            i = self._num_images() - 1
+        return self._get_image_num(i)
 
     @cherrypy.expose
     def upload(self, myFiles):
