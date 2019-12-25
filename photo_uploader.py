@@ -15,14 +15,42 @@ class PhotoUploader(object):
     def __init__(self, upload_dir):
         self._upload_dir = upload_dir
 
+    def _splitext(self, path):
+        name_parts = path.split('.')
+        return '.'.join(name_parts[:-1]), name_parts[-1]
+
+    _IMAGE_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
+    def _generate_image_list(self):
+        image_list = []
+        for file_name in os.listdir(self._upload_dir):
+            filename, extension = self._splitext(file_name)
+            if extension.lower() in self._IMAGE_FILE_EXTENSIONS:
+                thumbnail_name = '%s_thumb.%s' % (filename, extension)
+                thumbnail_path = os.path.join(self._upload_dir, 'thumbnails', thumbnail_name)
+                if os.path.exists(thumbnail_path):
+                    image_list.append(((file_name, thumbnail_name)))
+        return image_list
+                
+    def _generate_image_selection_list(self, image_list):
+        list_html = ''
+        first_element = True
+        for image in image_list:
+            list_html += '<img class="thumbnail%s" src="slides/thumbnails/%s" data-image-path="%s">' % (' thumbnail_selected' if first_element else '', image[1], image[0])
+            first_element = False
+        return list_html
+
     @cherrypy.expose
     def index(self):
+        image_list = self._generate_image_list()
+        image_selection_html = self._generate_image_selection_list(image_list)
         upload_message = cherrypy.session[self.UPLOAD_MSG_KEY] if self.UPLOAD_MSG_KEY in cherrypy.session else ''
         if self.UPLOAD_MSG_KEY in cherrypy.session:
             del cherrypy.session[self.UPLOAD_MSG_KEY]
         with open('photos.html') as f:
             html = f.read()
-        return html.replace('<<UPLOAD_MESSAGE>>', upload_message)
+        return html.replace('<<UPLOAD_MESSAGE>>', upload_message). \
+                replace('<<IMAGE_SELECTION_LIST>>', image_selection_html). \
+                replace('<<SELECTED_IMAGE_PATH>>', 'slides/%s' % image_list[0][0])
 
     @cherrypy.expose
     def upload(self, myFiles):

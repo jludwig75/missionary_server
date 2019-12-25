@@ -1,6 +1,22 @@
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $(".thumbnail").click(function(){
+                    $(".thumbnail_selected").removeClass('thumbnail_selected');
+                    $(this).addClass('thumbnail_selected');
+                    var image_path = "slides/" + $(this).attr("data-image-path");
+                    $("#image_display").html('<img id="displayed_image" class="selected_image" src="' + image_path + '">');
+                });
+                $("#delete_image").click(function(){
+                    var image_path = $("#displayed_image").attr("src");
+                    if (confirm("Are you sure you want to delete " + image_path +"?")) {
+                        alert("Deleting " + image_path + ".");
+                    }
+                });
+            });
+        </script>
         <style>
             .header {
                 text-align: left;
@@ -60,6 +76,10 @@
             .thumbnail {
                 height: 100px;
                 width: 133px;
+                padding: 2px;
+            }
+            .thumbnail_selected {
+                background-color: blue;
             }
         </style>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,37 +98,16 @@
             <div class="image_view">
                 <div class="image_menu">
                     <h3>Image Options</h3>
-                    <button>Delete</button><br/>
+                    <button id="delete_image">Delete</button><br/>
                     <button>Rotate</button>
                 </div>
-                <div class="image_display">
-                    <img class="selected_image" src="slides/20191101_211311.png">
+                <div id="image_display" class="image_display">
+                    <img id="displayed_image" class="selected_image" src="<<SELECTED_IMAGE_PATH>>">
                 </div>
             </div>
             <div class="image_selector">
                 <h3>Select Image</h3>
-                <img class="thumbnail" src="slides/thumbnails/20191101_211311_thumb.png">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
-                <img class="thumbnail" src="">
+                <<IMAGE_SELECTION_LIST>>
             </div>
         </div>
 </body>
