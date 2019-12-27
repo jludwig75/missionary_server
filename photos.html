@@ -7,45 +7,86 @@
                 var parts = path.split("/");
                 return parts[parts.length - 1];
             }
+            function select_image(image_file_name) {
+                var image_path = "slides/" + image_file_name
+                $("#displayed_image").attr("src", image_path);
+                $("#selected_file_name").text(file_name_only(image_path));
+            }
+            function highlight_thumbnail(element_or_id) {
+                $(".thumbnail_selected").removeClass('thumbnail_selected');
+                $(element_or_id).addClass('thumbnail_selected');
+            }
+            function get_image_name_from_thumbnail(element_or_id) {
+                return $(element_or_id).attr("data-image-path");
+            }
+            function get_selected_image_path() {
+                return $("#displayed_image").attr("src");
+            }
+            function get_selected_image_name() {
+                var image_file_name = get_selected_image_path();
+                var parts = image_file_name.split('/')
+                return parts[parts.length - 1]
+            }
+            function get_thumbnail_id_for_image_name(image_file_name) {
+                return "#" + image_file_name.split('.')[0];
+            }
+            function highlight_thumbnail_for_image_name(image_file_name) {
+                var thumbnail_id = get_thumbnail_id_for_image_name(image_file_name);
+                highlight_thumbnail(thumbnail_id);
+            }
+            function select_image_thumbnail(image_file_name) {
+                highlight_thumbnail_for_image_name(image_file_name);
+                var thumbnail_id = get_thumbnail_id_for_image_name(image_file_name);
+                $("#image_selector").scrollTo($(thumbnail_id));
+            }
+            function remove_image_thumbnail(image_file_name) {
+                var thumbnail_id = get_thumbnail_id_for_image_name(image_file_name);
+                $(thumbnail_id).remove();
+            }
+            function select_image_by_image_name(image_file_name) {
+                select_image(image_file_name);
+                select_image_thumbnail(image_file_name);
+            }
             $(document).ready(function () {
                 $(".thumbnail").click(function(){
-                    $(".thumbnail_selected").removeClass('thumbnail_selected');
-                    $(this).addClass('thumbnail_selected');
-                    var image_path = "slides/" + $(this).attr("data-image-path");
-                    $("#displayed_image").attr("src", image_path);
-                    $("#selected_file_name").text(file_name_only(image_path));
+                    highlight_thumbnail(this);
+                    var image_file_name = get_image_name_from_thumbnail(this);
+                    select_image(image_file_name);
                 });
                 $("#delete_image").click(function(){
                     var image_path = $("#displayed_image").attr("src");
-                    var file_name = file_name_only(image_path);
-                    if (confirm("Are you sure you want to delete " + file_name +"?")) {
-                        $.ajax({
-                            url: 'delete?image_file_name=' + file_name,
-                            type: 'DELETE',
-                            success: function(result) {
-                                // Do something with the result
-                                // TODO: This is temporary. Use AJAX
-                                location.reload();
-                            },
-                            error: function(result) {
-                                alert('Failed to delete file')
-                            }
+                    var image_file_name = file_name_only(image_path);
+                    if (confirm("Are you sure you want to delete " + image_file_name +"?")) {
+                        // Get the next image first, before deleting the image since this file
+                        // name is the key used in getting the next image and the webserver
+                        // won't know about it once it's deleted.
+                        $.get("next?image_file_name=" + image_file_name, function(new_image_file_name) {
+                            // Mow that we know what image to select next, we can delete the selected image.
+                            $.ajax({
+                                url: 'delete?image_file_name=' + image_file_name,
+                                type: 'DELETE',
+                                success: function(result) {
+                                    // 1. Get nex next image
+                                        // 2. Remove the thumbnail element
+                                        remove_image_thumbnail(image_file_name)
+                                        // 3. Select the next image
+                                        select_image_by_image_name(new_image_file_name);
+                                },
+                                error: function(result) {
+                                    alert('Failed to delete image ' + image_file_name + ', reloading page.')
+                                    // We don't know if the file was deleted or not, so reload the page.
+                                    location.reload();
+                                }
+                            });
+                        }).fail(function(data){
+                            alert("Error deleting image " + image_file_name);
                         });
                     }
                 });
                 function advance_image(direction) {
-                    var image_file_name = $("#displayed_image").attr("src");
-                    var parts = image_file_name.split('/')
-                    image_file_name = parts[parts.length - 1]
-                    $.get(direction + "?image_file_name=" + image_file_name, function(data){
-                        var new_image_path = "slides/" + data
-                        $("#displayed_image").attr("src", new_image_path);
-                        $(".thumbnail_selected").removeClass('thumbnail_selected');
-                        var img_id = "#" + data.split('.')[0];
-                        $(img_id).addClass('thumbnail_selected');
-                        $("#image_selector").scrollTo($(img_id));
-                        var image_path = "slides/" + $(img_id).attr("data-image-path");
-                        $("#selected_file_name").text(file_name_only(image_path));
+                    var image_file_name = get_selected_image_name();
+                    $.get(direction + "?image_file_name=" + image_file_name, function(new_image_file_name){
+                        select_image_by_image_name(new_image_file_name);
                     });
                 }
                 $("#next_pane").click(function(){

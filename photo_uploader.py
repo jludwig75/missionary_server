@@ -114,6 +114,8 @@ class PhotoUploader(object):
             file_path = os.path.join(self._upload_dir, image_file_name)
             print('deleting %s' % file_path)
             os.unlink(file_path)
+            # Remove the image file name from the session image list
+            cherrypy.session[self.IMAGE_LIST_KEY] = [x for x in cherrypy.session[self.IMAGE_LIST_KEY] if x[0] != image_file_name]
         except Exception as e:
             raise cherrypy.HTTPError(500, str(e))
 
