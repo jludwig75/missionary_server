@@ -106,6 +106,17 @@ class PhotoUploader(object):
         cherrypy.session[self.UPLOAD_MSG_KEY] = '<p>%u of %u files successfully uploaded</p>' % (files_sent, files_uploaded)
         raise cherrypy.HTTPRedirect(cherrypy.url('.'))
 
+    @cherrypy.expose
+    def delete(self, image_file_name):
+        if cherrypy.request.method != 'DELETE':
+            raise cherrypy.HTTPError(405)
+        try:
+            file_path = os.path.join(self._upload_dir, image_file_name)
+            print('deleting %s' % file_path)
+            os.unlink(file_path)
+        except Exception as e:
+            raise cherrypy.HTTPError(500, str(e))
+
 if __name__ == '__main__':
     # CherryPy always starts with app.root when trying to map request URIs
     # to objects, so we need to mount a request handler root. A request

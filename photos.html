@@ -19,7 +19,18 @@
                     var image_path = $("#displayed_image").attr("src");
                     var file_name = file_name_only(image_path);
                     if (confirm("Are you sure you want to delete " + file_name +"?")) {
-                        alert("Deleting " + file_name + ".");
+                        $.ajax({
+                            url: 'delete?image_file_name=' + file_name,
+                            type: 'DELETE',
+                            success: function(result) {
+                                // Do something with the result
+                                // TODO: This is temporary. Use AJAX
+                                location.reload();
+                            },
+                            error: function(result) {
+                                alert('Failed to delete file')
+                            }
+                        });
                     }
                 });
                 function advance_image(direction) {
