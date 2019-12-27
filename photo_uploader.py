@@ -119,6 +119,15 @@ class PhotoUploader(object):
         except Exception as e:
             raise cherrypy.HTTPError(500, str(e))
 
+    @cherrypy.expose
+    def resize_images(self):
+        if cherrypy.request.method != 'PUT':
+            raise cherrypy.HTTPError(405)
+        # TODO: Make this more sophisticated
+        ret = os.system('./resize-images slides')
+        if ret != 0:
+            raise cherrypy.HTTPError(500)
+
 if __name__ == '__main__':
     # CherryPy always starts with app.root when trying to map request URIs
     # to objects, so we need to mount a request handler root. A request

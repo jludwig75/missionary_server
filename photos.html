@@ -95,6 +95,29 @@
                 $("#previous_pane").click(function(){
                     advance_image("previous");
                 });
+                function on_click_resize_images() {
+                    // TODO: This can be better. Maybe show a status on the webpage
+                    // alert('Resizing images. Please wait...');
+                    var old_button_text = $("#resize_images").text()
+                    $("#resize_images").text("Resizing. Please wait...");
+                    $("#resize_images").prop('disabled', true);
+                    $.ajax({
+                        url: 'resize_images',
+                        type: 'PUT',
+                        success: function(result) {
+                            $("#resize_images").text(old_button_text);
+                            $("#resize_images").prop('disabled', false);
+                            $("#resize_images").one("click", on_click_resize_images);
+                        },
+                        error: function(result) {
+                            alert('Error resizing images.')
+                            $("#resize_images").text(old_button_text);
+                            $("#resize_images").prop('disabled', false);
+                            $("#resize_images").one("click", on_click_resize_images);
+                        }
+                    });
+                }
+                $("#resize_images").one("click", on_click_resize_images);
             });
         </script>
         <style>
@@ -107,6 +130,9 @@
                 border-width: 1;
                 padding-bottom: 0.5em;
             }
+            .header_element {
+                float: left;
+            }
             .image_view {
                 height: 64%;
             }
@@ -117,6 +143,7 @@
                 white-space: nowrap;
             }
             h3 {
+                margin: 0;
                 margin-bottom: 0.3em;
             }
             .upload_form {
@@ -184,13 +211,18 @@
     </head>
     <body>
         <div class="header">
-            <<UPLOAD_MESSAGE>>
-            <h3>Upload New Photos</h3>
-                <form class="upload_form" action="upload" method="post" enctype="multipart/form-data">
-                    <input value="Select Photos" type="file" name="myFiles" accept="image/*" multiple/><br />
-                    <input value="Upload" type="submit" />
-            </form>
-            <a href="/">Back to Slideshow</a>
+            <div class="header_element">
+                <<UPLOAD_MESSAGE>>
+                <h3>Upload New Photos</h3>
+                    <form class="upload_form" action="upload" method="post" enctype="multipart/form-data">
+                        <input value="Select Photos" type="file" name="myFiles" accept="image/*" multiple/><br />
+                        <input value="Upload" type="submit" />
+                </form>
+                <a href="/">Back to Slideshow</a>
+            </div>
+            <div class="header_element">
+                <button id="resize_images">Resize Images</button>
+            </div>
         </div>
         <div class="main">
             <div class="image_view">
