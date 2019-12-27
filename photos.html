@@ -131,12 +131,14 @@
                             $("#adjust_images").text(old_button_text);
                             $("#adjust_images").prop('disabled', false);
                             $("#adjust_images").one("click", on_click_adjust_images);
+                            location.reload();
                         },
                         error: function(result) {
                             alert('Error adjusting images.')
                             $("#adjust_images").text(old_button_text);
                             $("#adjust_images").prop('disabled', false);
                             $("#adjust_images").one("click", on_click_adjust_images);
+                            location.reload();
                         }
                     });
                 }
@@ -154,12 +156,14 @@
                             $("#make_thumbnails").text(old_button_text);
                             $("#make_thumbnails").prop('disabled', false);
                             $("#make_thumbnails").one("click", on_click_make_thumbnails);
+                            location.reload();
                         },
                         error: function(result) {
                             alert('Error making thumbnail images.')
                             $("#make_thumbnails").text(old_button_text);
                             $("#make_thumbnails").prop('disabled', false);
                             $("#make_thumbnails").one("click", on_click_make_thumbnails);
+                            location.reload();
                         }
                     });
                 }
