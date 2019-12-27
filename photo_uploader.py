@@ -66,8 +66,8 @@ class PhotoUploader(object):
             html = f.read()
         return html.replace('<<UPLOAD_MESSAGE>>', upload_message). \
                 replace('<<IMAGE_SELECTION_LIST>>', image_selection_html). \
-                replace('<<SELECTED_IMAGE_PATH>>', 'slides/%s' % image_list[0][0]). \
-                replace('<<SELECTED_IMAGE_FILE_NAME>>', image_list[0][0])
+                replace('<<SELECTED_IMAGE_PATH>>', 'slides/%s' % image_list[0][0] if len(image_list) > 0 else ''). \
+                replace('<<SELECTED_IMAGE_FILE_NAME>>', image_list[0][0] if len(image_list) > 0 else '')
 
     @cherrypy.expose
     def next(self, image_file_name):
