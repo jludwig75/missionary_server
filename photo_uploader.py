@@ -128,6 +128,24 @@ class PhotoUploader(object):
         if ret != 0:
             raise cherrypy.HTTPError(500)
 
+    @cherrypy.expose
+    def adjust_images(self):
+        if cherrypy.request.method != 'PUT':
+            raise cherrypy.HTTPError(405)
+        # TODO: Make this more sophisticated
+        ret = os.system('./adjust-images slides')
+        if ret != 0:
+            raise cherrypy.HTTPError(500)
+
+    @cherrypy.expose
+    def make_thumbnails(self):
+        if cherrypy.request.method != 'PUT':
+            raise cherrypy.HTTPError(405)
+        # TODO: Make this more sophisticated
+        ret = os.system('./make-thumbnails slides slides/thumbnails')
+        if ret != 0:
+            raise cherrypy.HTTPError(500)
+
 if __name__ == '__main__':
     # CherryPy always starts with app.root when trying to map request URIs
     # to objects, so we need to mount a request handler root. A request

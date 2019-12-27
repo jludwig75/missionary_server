@@ -118,6 +118,52 @@
                     });
                 }
                 $("#resize_images").one("click", on_click_resize_images);
+                function on_click_adjust_images() {
+                    // TODO: This can be better. Maybe show a status on the webpage
+                    // alert('Resizing images. Please wait...');
+                    var old_button_text = $("#adjust_images").text()
+                    $("#adjust_images").text("Adjusting. Please wait...");
+                    $("#adjust_images").prop('disabled', true);
+                    $.ajax({
+                        url: 'adjust_images',
+                        type: 'PUT',
+                        success: function(result) {
+                            $("#adjust_images").text(old_button_text);
+                            $("#adjust_images").prop('disabled', false);
+                            $("#adjust_images").one("click", on_click_adjust_images);
+                        },
+                        error: function(result) {
+                            alert('Error adjusting images.')
+                            $("#adjust_images").text(old_button_text);
+                            $("#adjust_images").prop('disabled', false);
+                            $("#adjust_images").one("click", on_click_adjust_images);
+                        }
+                    });
+                }
+                $("#adjust_images").one("click", on_click_adjust_images);
+                function on_click_make_thumbnails() {
+                    // TODO: This can be better. Maybe show a status on the webpage
+                    // alert('Resizing images. Please wait...');
+                    var old_button_text = $("#make_thumbnails").text()
+                    $("#make_thumbnails").text("Making. Please wait...");
+                    $("#make_thumbnails").prop('disabled', true);
+                    $.ajax({
+                        url: 'make_thumbnails',
+                        type: 'PUT',
+                        success: function(result) {
+                            $("#make_thumbnails").text(old_button_text);
+                            $("#make_thumbnails").prop('disabled', false);
+                            $("#make_thumbnails").one("click", on_click_make_thumbnails);
+                        },
+                        error: function(result) {
+                            alert('Error making thumbnail images.')
+                            $("#make_thumbnails").text(old_button_text);
+                            $("#make_thumbnails").prop('disabled', false);
+                            $("#make_thumbnails").one("click", on_click_make_thumbnails);
+                        }
+                    });
+                }
+                $("#make_thumbnails").one("click", on_click_make_thumbnails);
             });
         </script>
         <style>
@@ -221,7 +267,9 @@
                 <a href="/">Back to Slideshow</a>
             </div>
             <div class="header_element">
-                <button id="resize_images">Resize Images</button>
+                <button id="resize_images">Resize Images</button><br/>
+                <button id="adjust_images">Adjust Images</button><br/>
+                <button id="make_thumbnails">Make Thumbnail Images</button>
             </div>
         </div>
         <div class="main">
