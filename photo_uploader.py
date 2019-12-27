@@ -87,6 +87,8 @@ class PhotoUploader(object):
 
     @cherrypy.expose
     def upload(self, myFiles):
+        if not isinstance(myFiles, (list, tuple)):
+            myFiles = [myFiles]
         files_sent = len(myFiles)
         files_uploaded = 0
 
