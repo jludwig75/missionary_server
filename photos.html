@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
         <script>
             function file_name_only(path) {
                 var parts = path.split("/");
@@ -29,7 +30,11 @@
                         var new_image_path = "slides/" + data
                         $("#displayed_image").attr("src", new_image_path);
                         $(".thumbnail_selected").removeClass('thumbnail_selected');
-                        $("#" + data.split('.')[0]).addClass('thumbnail_selected');
+                        var img_id = "#" + data.split('.')[0];
+                        $(img_id).addClass('thumbnail_selected');
+                        $("#image_selector").scrollTo($(img_id));
+                        var image_path = "slides/" + $(img_id).attr("data-image-path");
+                        $("#selected_file_name").text(file_name_only(image_path));
                     });
                 }
                 $("#next_pane").click(function(){
@@ -56,8 +61,7 @@
             .image_selector {
                 height: 22%;
                 overflow-x: scroll;
-                overflow-y: hidden;
-                -ms-overflow-y: hidden;
+                -ms-overflow-x: hidden;
                 white-space: nowrap;
             }
             h3 {
@@ -154,7 +158,7 @@
                     Next
                 </div>
             </div>
-            <div class="image_selector">
+            <div id="image_selector" class="image_selector">
                 <h3>Select Image</h3>
                 <<IMAGE_SELECTION_LIST>>
             </div>
