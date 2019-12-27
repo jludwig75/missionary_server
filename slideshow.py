@@ -25,18 +25,18 @@ def _get_image_orientation(image_file_name):
 
 class SlideShow(object):
     _SLIDESHOW_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
-    _IMAGE_LIST_KEY = 'image_list'
+    _IMAGE_LIST_KEY = 'slide_show_image_list'
     def __init__(self, image_dir_path):
         self._image_dir_path = image_dir_path
         self._lock = Lock()
 
     # call with self._lock held
     def _generate_image_list(self):
-        cherrypy.session['image_list'] = []
+        cherrypy.session[self._IMAGE_LIST_KEY] = []
         for file_name in os.listdir(self._image_dir_path):
             extension = file_name.split('.')[-1]
             if extension.lower() in self._SLIDESHOW_FILE_EXTENSIONS:
-                cherrypy.session['image_list'].append('slides/' + file_name)
+                cherrypy.session[self._IMAGE_LIST_KEY].append('slides/' + file_name)
 
     # call with self._lock held
     def _get_image_list(self):
@@ -53,6 +53,6 @@ class SlideShow(object):
         with self._lock:
             file_name = random.choice(self._get_image_list())
             self._remove_image_from_list(file_name)
-            # print('selected "%s" left: %s' % (file_name, str(cherrypy.session['image_list'])))
+            # print('selected "%s" left: %s' % (file_name, str(cherrypy.session[self._IMAGE_LIST_KEY])))
         ret = {'file_name': file_name, 'orientation': _get_image_orientation(file_name)}
         return json.dumps(ret)
