@@ -52,7 +52,7 @@ def pad_image_to_landscape(img):
 
 def save_image(img, image_file_path, delete_original=True):
     file_name, extension = os.path.splitext(image_file_path)
-    if extension.lower() == 'png':
+    if extension.lower() == '.png':
         file_name = file_name + '_adjusted'
     else:
         extension = 'png'

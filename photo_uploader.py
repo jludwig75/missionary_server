@@ -148,6 +148,28 @@ class PhotoUploader(object):
         if ret != 0:
             raise cherrypy.HTTPError(500)
 
+    @cherrypy.expose
+    def rotate_image(self, image_file_name, direction):
+        if cherrypy.request.method != 'PUT':
+            raise cherrypy.HTTPError(405)
+
+        # 1. Rotate the image.
+        # TODO: Don't delete the image and track that the image is modified so things can be undone.
+        ret = os.system('./rotate-image -d %s -D %s' % (direction, os.path.join(self._upload_dir, image_file_name)))
+        if ret != 0:
+            raise cherrypy.HTTPError(500)
+
+        # 2. Delete the old image thumbnail.
+        file_name, extension = self._splitext(image_file_name)
+        thumbnail_name = os.path.join(self._upload_dir, 'thumbnails', '%s_thumb.%s' % (file_name, extension))
+        print('Deleting %s' % thumbnail_name)
+        os.unlink(thumbnail_name)
+
+        # 3. Re-make thumbnails.
+        ret = os.system('./make-thumbnails slides slides/thumbnails')
+        if ret != 0:
+            raise cherrypy.HTTPError(500)
+
 if __name__ == '__main__':
     # CherryPy always starts with app.root when trying to map request URIs
     # to objects, so we need to mount a request handler root. A request
