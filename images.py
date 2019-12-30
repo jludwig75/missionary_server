@@ -2,7 +2,6 @@
 import sys
 import os
 from PIL import Image, ExifTags
-from images import pad_image_to_landscape, save_image
 
 
 TARGET_WIDTH_TO_HEIGHT_RATIO = 4.0 / 3.0
@@ -40,6 +39,29 @@ def correct_image_rotation(img, orientation):
         img = img.rotate(180, expand=True)
     return img
 
+def pad_image_to_landscape(img):
+    if img.width > img.height:
+        return img
+    print('  padding image to landscape')
+    target_width = int(TARGET_WIDTH_TO_HEIGHT_RATIO * img.height)
+    new_image = Image.new('RGBA', (target_width, img.height), (0, 0, 0, 0))
+
+    offset = int((target_width - img.width) / 2)
+    new_image.paste(img, (offset, 0))
+    return new_image
+
+def save_image(img, image_file_path, delete_original=True):
+    file_name, extension = os.path.splitext(image_file_path)
+    if extension.lower() == 'png':
+        file_name = file_name + '_adjusted'
+    else:
+        extension = 'png'
+    new_file_name = '%s.%s' % (file_name, extension)
+    print('  saving image %s as %s' % (image_file_path, new_file_name))
+    img.save(new_file_name)
+    if delete_original:
+        os.unlink(image_file_path)
+
 def adjust_image(image_file_path):
     print('adjusting image %s' % image_file_path)
     img = Image.open(image_file_path)
@@ -68,9 +90,3 @@ def adjust_images(image_dir_path):
         extension = file_name.split('.')[-1]
         if extension.lower() in IMAGE_FILE_EXTENSIONS:
             adjust_image(os.path.join(image_dir_path, file_name))
-
-dir_path = '.'
-if len(sys.argv) > 1:
-    dir_path = sys.argv[1]
-
-adjust_images(dir_path)
