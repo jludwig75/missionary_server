@@ -174,7 +174,11 @@
                         this.task_handler = task_handler;
                         this.disabled_button_text = disabled_button_text;
                         this.enabled_button_text = $(button_id).text();
+                        this.peer = null;
                         this.enable();
+                    }
+                    set_peer(peer) {
+                        this.peer = peer;
                     }
                     disable() {
                         $(this.button_id).text("Rotating. Please wait...");
@@ -187,8 +191,10 @@
                         // Make sure the handler is off so we don't get two hanlders.
                         $(this.button_id).off("click");
                         $(this.button_id).one("click", function() {
-                            rotate_cw_button.disable();
-                            rotate_ccw_button.disable();
+                            self.disable();
+                            if (self.peer != null) {
+                                self.peer.disable();
+                            }
                             self.task_handler();
                         });
                     }
@@ -225,6 +231,8 @@
                 var rotate_ccw_button = new RotateButton("#rotate_ccw", "Rotating. Please wait...", function() {
                     on_rotate_image('ccw');
                 });
+                rotate_cw_button.set_peer(rotate_ccw_button);
+                rotate_ccw_button.set_peer(rotate_cw_button);
             });
         </script>
         <style>
