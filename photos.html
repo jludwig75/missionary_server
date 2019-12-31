@@ -213,6 +213,7 @@
                             // Change the selected image thumbnail and attributes
                             $(".thumbnail_selected").attr("src", new_thumbnail_path);
                             $(".thumbnail_selected").attr("data-image-path", new_image_file_path);
+                            $("#selected_file_name").text(file_name_only(new_image_file_path));
 
                             rotate_cw_button.enable();
                             rotate_ccw_button.enable();
