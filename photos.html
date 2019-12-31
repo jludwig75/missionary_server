@@ -168,7 +168,7 @@
                 }
                 $("#make_thumbnails").one("click", on_click_make_thumbnails);
 
-                class BackendTaskSubmitButton {
+                class RotateButton {
                     constructor(button_id, disabled_button_text, task_handler) {
                         this.button_id = button_id;
                         this.task_handler = task_handler;
@@ -219,54 +219,12 @@
                         }
                     });
                 }
-                var rotate_cw_button = new BackendTaskSubmitButton("#rotate_cw", "Rotating. Please wait...", function() {
+                var rotate_cw_button = new RotateButton("#rotate_cw", "Rotating. Please wait...", function() {
                     on_rotate_image('cw');
                 });
-                var rotate_ccw_button = new BackendTaskSubmitButton("#rotate_ccw", "Rotating. Please wait...", function() {
+                var rotate_ccw_button = new RotateButton("#rotate_ccw", "Rotating. Please wait...", function() {
                     on_rotate_image('ccw');
                 });
-                // function on_click_rotate_image(direction) {
-                //     // TODO: This can be better. Maybe show a status on the webpage
-                //     // alert('Resizing images. Please wait...');
-                //     var old_button_text = $("#rotate_cw").text()
-                //     $("#rotate_cw").text("Rotating. Please wait...");
-                //     $("#rotate_cw").prop('disabled', true);
-                //     $.ajax({
-                //         url: 'rotate_image?image_file_path=' + get_selected_image_path() + '&direction=' + direction,
-                //         type: 'PUT',
-                //         success: function(new_image_file_paths) {
-                //             var parts = new_image_file_paths.split(',')
-                //             var new_image_file_path = parts[0]
-                //             var new_thumbnail_path = parts[1]
-                //             $("#rotate_cw").text(old_button_text);
-                //             $("#rotate_cw").prop('disabled', false);
-                //             $("#rotate_cw").one("click", function() {
-                //                 on_click_rotate_image('cw');
-                //             });
-                //             // Change the selected image path to be the rotated image
-                //             $("#displayed_image").attr("src", new_image_file_path);
-
-                //             // Change the selected image thumbnail and attributes
-                //             $(".thumbnail_selected").attr("src", new_thumbnail_path);
-                //             $(".thumbnail_selected").attr("data-image-path", new_image_file_path);
-                //         },
-                //         error: function(result) {
-                //             alert('Error rotating image.')
-                //             $("#rotate_cw").text(old_button_text);
-                //             $("#rotate_cw").prop('disabled', false);
-                //             $("#rotate_cw").one("click", function() {
-                //                 on_click_rotate_image('cw');
-                //             });
-                //             location.reload();
-                //         }
-                //     });
-                // }
-                // $("#rotate_cw").one("click", function() {
-                //     on_click_rotate_image('cw');
-                // });
-                // $("#rotate_ccw").one("click", function() {
-                //     on_click_rotate_image('ccw');
-                // });
             });
         </script>
         <style>
