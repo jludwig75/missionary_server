@@ -181,7 +181,7 @@
                         this.peer = peer;
                     }
                     disable() {
-                        $(this.button_id).text("Rotating. Please wait...");
+                        $(this.button_id).text(this.disabled_button_text);
                         $(this.button_id).prop('disabled', true);
                     }
                     enable() {
