@@ -23,7 +23,7 @@ class PhotoUploader(object):
     _IMAGE_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff']
     def _generate_image_list(self):
         image_list = []
-        for file_name in os.listdir(self._upload_dir):
+        for file_name in sorted(os.listdir(self._upload_dir)):
             filename, extension = self._splitext(file_name)
             if extension.lower() in self._IMAGE_FILE_EXTENSIONS:
                 thumbnail_name = '%s_thumb.%s' % (filename, extension)
