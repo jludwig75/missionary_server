@@ -5,6 +5,7 @@ import os.path
 
 import cherrypy
 from cherrypy.lib import static
+from images import rotate_image
 
 localDir = os.path.dirname(__file__)
 absDir = os.path.join(os.getcwd(), localDir)
@@ -148,27 +149,52 @@ class PhotoUploader(object):
         if ret != 0:
             raise cherrypy.HTTPError(500)
 
+    def _thumbnail_from_inmage_path(self, image_file_path):
+        dir, filename = os.path.split(image_file_path)
+        file_name, extension = self._splitext(filename)
+        print(file_name, extension)
+        return os.path.join(dir, 'thumbnails', '%s_thumb.%s' % (file_name, extension))
+
+    def _base_file_name(self, path):
+        return os.path.split(path)[1]
+
+    def _update_image_list_entry(self, image_file_path, new_image_file_path, new_thumbnail_name):
+        print('Replacing entry for %s with (%s, %s)' % (image_file_path, new_image_file_path, new_thumbnail_name))
+        new_image_list = [x if x[0] != image_file_path else (new_image_file_path, new_thumbnail_name) for x in cherrypy.session[self.IMAGE_LIST_KEY]]
+        print(new_image_list)
+        cherrypy.session[self.IMAGE_LIST_KEY] = new_image_list
+
     @cherrypy.expose
-    def rotate_image(self, image_file_name, direction):
+    def rotate_image(self, image_file_path, direction):
         if cherrypy.request.method != 'PUT':
             raise cherrypy.HTTPError(405)
 
         # 1. Rotate the image.
         # TODO: Don't delete the image and track that the image is modified so things can be undone.
-        ret = os.system('./rotate-image -d %s -D %s' % (direction, os.path.join(self._upload_dir, image_file_name)))
-        if ret != 0:
-            raise cherrypy.HTTPError(500)
+        degrees = 0
+        if direction.lower() == 'cw':
+            degrees = 270
+        elif direction.lower() == 'ccw':
+            degrees = 90
+        else:
+            raise cherrypy.HTTPError(400, 'Invalid direction "%s" must be "cw" or "ccw"', direction)
+        new_image_file_path = rotate_image(image_file_path, degrees, delete_original=True)
 
         # 2. Delete the old image thumbnail.
-        file_name, extension = self._splitext(image_file_name)
-        thumbnail_name = os.path.join(self._upload_dir, 'thumbnails', '%s_thumb.%s' % (file_name, extension))
+        thumbnail_name = self._thumbnail_from_inmage_path(image_file_path)
         print('Deleting %s' % thumbnail_name)
         os.unlink(thumbnail_name)
 
-        # 3. Re-make thumbnails.
+        # 3. Replace the image list entry
+        new_thumbnail_name = self._thumbnail_from_inmage_path(new_image_file_path)
+        self._update_image_list_entry(self._base_file_name(image_file_path), self._base_file_name(new_image_file_path), self._base_file_name(new_thumbnail_name))
+
+        # 4. Re-make thumbnails.
         ret = os.system('./make-thumbnails slides slides/thumbnails')
         if ret != 0:
             raise cherrypy.HTTPError(500)
+
+        return '%s, %s' % (new_image_file_path, new_thumbnail_name)
 
 if __name__ == '__main__':
     # CherryPy always starts with app.root when trying to map request URIs

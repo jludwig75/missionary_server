@@ -54,13 +54,15 @@ def save_image(img, image_file_path, delete_original=True):
     file_name, extension = os.path.splitext(image_file_path)
     if extension.lower() == '.png':
         file_name = file_name + '_adjusted'
+        extension = 'png'
     else:
         extension = 'png'
-    new_file_name = '%s.%s' % (file_name, extension)
-    print('  saving image %s as %s' % (image_file_path, new_file_name))
-    img.save(new_file_name)
+    new_file_path = '%s.%s' % (file_name, extension)
+    print('  saving image %s as %s' % (image_file_path, new_file_path))
+    img.save(new_file_path)
     if delete_original:
         os.unlink(image_file_path)
+    return new_file_path
 
 def adjust_image(image_file_path):
     print('adjusting image %s' % image_file_path)
@@ -90,3 +92,10 @@ def adjust_images(image_dir_path):
         extension = file_name.split('.')[-1]
         if extension.lower() in IMAGE_FILE_EXTENSIONS:
             adjust_image(os.path.join(image_dir_path, file_name))
+
+def rotate_image(image_file_name, degrees, delete_original):
+    img = Image.open(image_file_name)
+    img = img.rotate(degrees, expand=True)
+    if img.height > img.width:
+        img = pad_image_to_landscape(img)
+    return save_image(img, image_file_name, delete_original)

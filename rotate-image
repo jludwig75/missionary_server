@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
-from PIL import Image
-from images import pad_image_to_landscape, save_image
+from images import rotate_image
 import argparse
 import sys
-
-
-def rotate_image(image_file_name, degrees, delete_original):
-    img = Image.open(image_file_name)
-    img = img.rotate(degrees, expand=True)
-    if img.height > img.width:
-        img = pad_image_to_landscape(img)
-    save_image(img, image_file_name, delete_original)
 
 
 if __name__ == '__main__':

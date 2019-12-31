@@ -66,11 +66,10 @@
                                 url: 'delete?image_file_name=' + image_file_name,
                                 type: 'DELETE',
                                 success: function(result) {
-                                    // 1. Get nex next image
-                                        // 2. Remove the thumbnail element
-                                        remove_image_thumbnail(image_file_name)
-                                        // 3. Select the next image
-                                        select_image_by_image_name(new_image_file_name);
+                                    // 2. Remove the thumbnail element
+                                    remove_image_thumbnail(image_file_name)
+                                    // 3. Select the next image
+                                    select_image_by_image_name(new_image_file_path);
                                 },
                                 error: function(result) {
                                     alert('Failed to delete image ' + image_file_name + ', reloading page.')
@@ -168,6 +167,49 @@
                     });
                 }
                 $("#make_thumbnails").one("click", on_click_make_thumbnails);
+
+                function on_click_rotate_image(direction) {
+                    // TODO: This can be better. Maybe show a status on the webpage
+                    // alert('Resizing images. Please wait...');
+                    var old_button_text = $("#rotate_cw").text()
+                    $("#rotate_cw").text("Rotating. Please wait...");
+                    $("#rotate_cw").prop('disabled', true);
+                    $.ajax({
+                        url: 'rotate_image?image_file_path=' + get_selected_image_path() + '&direction=' + direction,
+                        type: 'PUT',
+                        success: function(new_image_file_paths) {
+                            var parts = new_image_file_paths.split(',')
+                            var new_image_file_path = parts[0]
+                            var new_thumbnail_path = parts[1]
+                            $("#rotate_cw").text(old_button_text);
+                            $("#rotate_cw").prop('disabled', false);
+                            $("#rotate_cw").one("click", function() {
+                                on_click_rotate_image('cw');
+                            });
+                            // Change the selected image path to be the rotated image
+                            $("#displayed_image").attr("src", new_image_file_path);
+
+                            // Change the selected image thumbnail and attributes
+                            $(".thumbnail_selected").attr("src", new_thumbnail_path);
+                            $(".thumbnail_selected").attr("data-image-path", new_image_file_path);
+                        },
+                        error: function(result) {
+                            alert('Error rotating image.')
+                            $("#rotate_cw").text(old_button_text);
+                            $("#rotate_cw").prop('disabled', false);
+                            $("#rotate_cw").one("click", function() {
+                                on_click_rotate_image('cw');
+                            });
+                            location.reload();
+                        }
+                    });
+                }
+                $("#rotate_cw").one("click", function() {
+                    on_click_rotate_image('cw');
+                });
+                $("#rotate_ccw").one("click", function() {
+                    on_click_rotate_image('ccw');
+                });
             });
         </script>
         <style>
@@ -282,7 +324,8 @@
                     <h3 id="selected_file_name"><<SELECTED_IMAGE_FILE_NAME>></h3>
                     <h3>Image Options</h3>
                     <button id="delete_image">Delete</button><br/>
-                    <button>Rotate</button>
+                    <button id="rotate_cw">Rotate Clockwise</button>
+                    <button id="rotate_ccw">Rotate Counterclockwise</button>
                 </div>
                 <div id="previous_pane">
                     Previous
